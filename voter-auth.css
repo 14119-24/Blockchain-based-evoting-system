@@ -1,0 +1,955 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+body.auth-page.voter-login-page,
+body.auth-page.voter-register-page {
+    position: relative;
+    align-items: stretch;
+    padding: 1.5rem;
+    overflow-x: hidden;
+    font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.15), transparent 28%),
+        radial-gradient(circle at 85% 16%, rgba(30, 64, 175, 0.28), transparent 24%),
+        linear-gradient(145deg, #071223 0%, #0b1830 42%, #0f2545 100%);
+}
+
+body.auth-page.voter-login-page::before,
+body.auth-page.voter-register-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 44px 44px;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+body.auth-page.voter-login-page::after,
+body.auth-page.voter-register-page::after {
+    content: "";
+    position: fixed;
+    inset: auto -8rem -10rem auto;
+    width: 26rem;
+    height: 26rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0) 68%);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+body.auth-page.voter-login-page .auth-layout,
+body.auth-page.voter-register-page .auth-layout {
+    position: relative;
+    z-index: 1;
+    width: min(1240px, 100%);
+    min-height: calc(100vh - 3rem);
+    display: grid;
+    grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 0.88fr);
+    gap: 1.75rem;
+    margin: 0 auto;
+    align-items: center;
+}
+
+body.auth-page.voter-register-page .auth-layout.register-layout {
+    width: min(1400px, 100%);
+    grid-template-columns: minmax(320px, 0.8fr) minmax(680px, 1fr);
+    align-items: start;
+}
+
+body.auth-page.voter-login-page .auth-showcase,
+body.auth-page.voter-register-page .auth-showcase {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.4rem;
+    min-width: 0;
+}
+
+body.auth-page.voter-register-page .auth-showcase {
+    position: sticky;
+    top: 1.5rem;
+    min-height: auto;
+}
+
+body.auth-page.voter-login-page .showcase-panel,
+body.auth-page.voter-register-page .showcase-panel {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(2rem, 4vw, 3rem);
+    border-radius: 1.9rem;
+    background:
+        linear-gradient(180deg, rgba(12, 27, 52, 0.95) 0%, rgba(10, 21, 41, 0.9) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 26px 70px rgba(2, 6, 23, 0.4);
+    color: #e2e8f0;
+}
+
+body.auth-page.voter-login-page .showcase-panel::before,
+body.auth-page.voter-register-page .showcase-panel::before {
+    content: "";
+    position: absolute;
+    inset: auto -5rem -5rem auto;
+    width: 16rem;
+    height: 16rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.3) 0%, rgba(56, 189, 248, 0) 72%);
+}
+
+body.auth-page.voter-login-page .showcase-kicker,
+body.auth-page.voter-register-page .showcase-kicker {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.14);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    color: #8bd3ff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.auth-page.voter-login-page .showcase-panel h1,
+body.auth-page.voter-register-page .showcase-panel h1 {
+    margin: 1rem 0 0.95rem;
+    font-size: clamp(2.25rem, 4.6vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.06em;
+    color: #f8fafc;
+    max-width: 12ch;
+}
+
+body.auth-page.voter-login-page .showcase-panel p,
+body.auth-page.voter-register-page .showcase-panel p {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: 38rem;
+    color: rgba(226, 232, 240, 0.78);
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+body.auth-page.voter-login-page .showcase-points,
+body.auth-page.voter-register-page .showcase-points {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+body.auth-page.voter-login-page .showcase-points span,
+body.auth-page.voter-register-page .showcase-points span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.42);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    color: #dbeafe;
+    font-weight: 600;
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body.auth-page.voter-login-page .showcase-points span:hover,
+body.auth-page.voter-register-page .showcase-points span:hover {
+    transform: translateX(4px);
+    background: rgba(15, 23, 42, 0.58);
+    border-color: rgba(96, 165, 250, 0.28);
+}
+
+body.auth-page.voter-login-page .showcase-points i,
+body.auth-page.voter-register-page .showcase-points i {
+    color: #67e8f9;
+}
+
+body.auth-page.voter-login-page .showcase-grid,
+body.auth-page.voter-register-page .showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body.auth-page.voter-login-page .showcase-card,
+body.auth-page.voter-register-page .showcase-card {
+    padding: 1.2rem 1.15rem;
+    border-radius: 1.4rem;
+    background: rgba(11, 23, 43, 0.82);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    box-shadow: 0 16px 35px rgba(2, 6, 23, 0.24);
+    color: #dbeafe;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.auth-page.voter-login-page .showcase-card:hover,
+body.auth-page.voter-register-page .showcase-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(125, 211, 252, 0.3);
+    box-shadow: 0 24px 45px rgba(2, 6, 23, 0.32);
+}
+
+body.auth-page.voter-login-page .showcase-card.accent,
+body.auth-page.voter-register-page .showcase-card.accent {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(12, 74, 110, 0.95), rgba(14, 116, 144, 0.88));
+}
+
+body.auth-page.voter-login-page .showcase-card-label,
+body.auth-page.voter-register-page .showcase-card-label {
+    display: inline-block;
+    margin-bottom: 0.7rem;
+    color: #8bd3ff;
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.auth-page.voter-login-page .showcase-card strong,
+body.auth-page.voter-register-page .showcase-card strong {
+    display: block;
+    margin-bottom: 0.55rem;
+    font-size: 1rem;
+    color: #f8fafc;
+    line-height: 1.45;
+}
+
+body.auth-page.voter-login-page .showcase-card p,
+body.auth-page.voter-register-page .showcase-card p {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.74);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+body.auth-page.voter-login-page .auth-container,
+body.auth-page.voter-register-page .auth-container {
+    position: relative;
+    align-self: center;
+    width: 100%;
+    max-width: none;
+    border-radius: 1.85rem;
+    border: 1px solid rgba(203, 213, 225, 0.7);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 32px 80px rgba(2, 6, 23, 0.24);
+    backdrop-filter: blur(18px);
+    overflow: hidden;
+}
+
+body.auth-page.voter-register-page .auth-container {
+    align-self: start;
+}
+
+body.auth-page.voter-login-page .auth-container::before,
+body.auth-page.voter-register-page .auth-container::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 6px;
+    background: linear-gradient(90deg, #1d4ed8 0%, #0ea5e9 55%, #22c55e 100%);
+}
+
+body.auth-page.voter-login-page .auth-header,
+body.auth-page.voter-register-page .auth-header {
+    padding: 2.1rem 2.1rem 1rem;
+    text-align: left;
+}
+
+body.auth-page.voter-login-page .back-home,
+body.auth-page.voter-register-page .back-home {
+    width: fit-content;
+    margin-bottom: 1.4rem;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid #dbe5f1;
+    background: #f8fbff;
+    color: #334155;
+    font-weight: 600;
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+body.auth-page.voter-login-page .back-home:hover,
+body.auth-page.voter-register-page .back-home:hover {
+    transform: translateX(-2px);
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+body.auth-page.voter-login-page .auth-brand,
+body.auth-page.voter-register-page .auth-brand {
+    justify-content: flex-start;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+    font-size: 1.12rem;
+    color: #1d4ed8;
+}
+
+body.auth-page.voter-login-page .auth-brand i,
+body.auth-page.voter-register-page .auth-brand i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.9rem;
+    background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+    color: #fff;
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.24);
+}
+
+body.auth-page.voter-login-page .auth-title,
+body.auth-page.voter-register-page .auth-title {
+    margin-bottom: 0.75rem;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.05em;
+    color: #0f172a;
+}
+
+body.auth-page.voter-login-page .auth-subtitle,
+body.auth-page.voter-register-page .auth-subtitle {
+    max-width: 40rem;
+    color: #64748b;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+body.auth-page.voter-login-page .auth-tabs {
+    padding: 0 2.1rem 1.6rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    border-bottom: 0;
+}
+
+body.auth-page.voter-login-page .tab-btn {
+    min-height: 3.75rem;
+    padding: 0.9rem 0.95rem;
+    border-radius: 1rem;
+    border: 1px solid #dbe5f1;
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 700;
+    transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+body.auth-page.voter-login-page .tab-btn:hover {
+    transform: translateY(-2px);
+    background: #f8fbff;
+    border-color: #cbd5e1;
+}
+
+body.auth-page.voter-login-page .tab-btn.active {
+    color: #0f172a;
+    border: 1px solid rgba(96, 165, 250, 0.45);
+    background: #fff;
+    box-shadow: 0 16px 32px rgba(59, 130, 246, 0.13);
+}
+
+body.auth-page.voter-login-page .auth-form,
+body.auth-page.voter-register-page .form-section {
+    animation: authFadeIn 0.28s ease;
+}
+
+body.auth-page.voter-login-page .auth-form {
+    padding: 0 2.1rem 1.65rem;
+}
+
+body.auth-page.voter-login-page .form-group,
+body.auth-page.voter-register-page .form-group {
+    margin-bottom: 1.15rem;
+}
+
+body.auth-page.voter-login-page .form-group label,
+body.auth-page.voter-register-page .form-group label {
+    margin-bottom: 0.55rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+body.auth-page.voter-login-page .form-group input,
+body.auth-page.voter-register-page .form-group input {
+    min-height: 3.55rem;
+    padding: 0.95rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid #d7e2f0;
+    background: #f8fbff;
+    color: #0f172a;
+    font-size: 0.98rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+body.auth-page.voter-login-page .form-group input::placeholder,
+body.auth-page.voter-register-page .form-group input::placeholder {
+    color: #94a3b8;
+}
+
+body.auth-page.voter-login-page .form-group input:hover,
+body.auth-page.voter-register-page .form-group input:hover {
+    border-color: #bfd0e5;
+    background: #fff;
+}
+
+body.auth-page.voter-login-page .form-group input:focus,
+body.auth-page.voter-register-page .form-group input:focus {
+    border-color: #1d4ed8;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+body.auth-page.voter-login-page .password-input input,
+body.auth-page.voter-register-page .password-input input {
+    padding-right: 3.6rem;
+}
+
+body.auth-page.voter-login-page .password-input,
+body.auth-page.voter-register-page .password-input {
+    position: relative;
+}
+
+body.auth-page.voter-login-page .toggle-password,
+body.auth-page.voter-register-page .toggle-password {
+    right: 0.8rem;
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 999px;
+    background: #eaf3ff;
+    color: #4f647f;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+body.auth-page.voter-login-page .toggle-password:hover,
+body.auth-page.voter-register-page .toggle-password:hover,
+body.auth-page.voter-login-page .password-input:focus-within .toggle-password,
+body.auth-page.voter-register-page .password-input:focus-within .toggle-password {
+    transform: translateY(-50%) scale(1.04);
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+body.auth-page.voter-login-page .error-message,
+body.auth-page.voter-register-page .error-message {
+    min-height: 1.15rem;
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+body.auth-page.voter-login-page .form-options {
+    margin: 0.35rem 0 1.35rem;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+body.auth-page.voter-login-page .checkbox-label,
+body.auth-page.voter-register-page .checkbox-label {
+    gap: 0.7rem;
+    color: #475569;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+body.auth-page.voter-login-page .checkbox-label input[type="checkbox"],
+body.auth-page.voter-register-page .checkbox-label input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0;
+    border: 1.5px solid #8ea6c4;
+    border-radius: 0.4rem;
+    background: #fff;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.auth-page.voter-login-page .checkbox-label input[type="checkbox"]:checked,
+body.auth-page.voter-register-page .checkbox-label input[type="checkbox"]:checked {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+body.auth-page.voter-login-page .checkbox-label input[type="checkbox"]:checked::after,
+body.auth-page.voter-register-page .checkbox-label input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 0.28rem;
+    top: 0.1rem;
+    width: 0.3rem;
+    height: 0.56rem;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+body.auth-page.voter-login-page .forgot-password,
+body.auth-page.voter-register-page .forgot-password,
+body.auth-page.voter-login-page .auth-links a,
+body.auth-page.voter-register-page .auth-links a,
+body.auth-page.voter-register-page .terms-agreement a {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+body.auth-page.voter-login-page .forgot-password:hover,
+body.auth-page.voter-register-page .forgot-password:hover,
+body.auth-page.voter-login-page .auth-links a:hover,
+body.auth-page.voter-register-page .auth-links a:hover,
+body.auth-page.voter-register-page .terms-agreement a:hover {
+    color: #1e40af;
+    text-decoration: none;
+}
+
+body.auth-page.voter-login-page .btn,
+body.auth-page.voter-register-page .btn {
+    min-height: 3.5rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease, border-color 0.22s ease;
+}
+
+body.auth-page.voter-login-page .btn:hover,
+body.auth-page.voter-register-page .btn:hover {
+    transform: translateY(-2px);
+}
+
+body.auth-page.voter-login-page .btn-primary,
+body.auth-page.voter-register-page .btn-primary {
+    background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
+    color: #fff;
+    box-shadow: 0 18px 32px rgba(37, 99, 235, 0.18);
+}
+
+body.auth-page.voter-login-page .btn-primary:hover,
+body.auth-page.voter-register-page .btn-primary:hover {
+    box-shadow: 0 24px 38px rgba(37, 99, 235, 0.22);
+}
+
+body.auth-page.voter-login-page .btn-secondary,
+body.auth-page.voter-register-page .btn-secondary {
+    border: 1px solid #c9dbef;
+    background: #fff;
+    color: #1d4ed8;
+}
+
+body.auth-page.voter-login-page .btn-secondary:hover,
+body.auth-page.voter-register-page .btn-secondary:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+body.auth-page.voter-login-page .btn-warning {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    color: #fff;
+    box-shadow: 0 18px 32px rgba(217, 119, 6, 0.18);
+}
+
+body.auth-page.voter-login-page .btn-warning:hover {
+    box-shadow: 0 24px 38px rgba(217, 119, 6, 0.22);
+}
+
+body.auth-page.voter-login-page .admin-warning {
+    margin-top: 1.35rem;
+    padding: 1rem 1.05rem;
+    border-radius: 1rem;
+    border: 1px solid #fed7aa;
+    background: #fff7ed;
+    color: #9a3412;
+}
+
+body.auth-page.voter-login-page .security-features {
+    margin: 0 1.75rem 1.75rem;
+    padding: 1.35rem;
+    border-radius: 1.4rem;
+    border: 1px solid #dbe7f3;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef5fc 100%);
+}
+
+body.auth-page.voter-login-page .security-features h3 {
+    margin-bottom: 1rem;
+    color: #0f172a;
+}
+
+body.auth-page.voter-login-page .security-features ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+body.auth-page.voter-login-page .security-features li {
+    margin: 0;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #334155;
+}
+
+body.auth-page.voter-login-page .security-features li i {
+    color: #0ea5e9;
+}
+
+body.auth-page.voter-login-page .auth-links,
+body.auth-page.voter-register-page .auth-links {
+    margin-top: 1.3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid #e5edf6;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+body.auth-page.voter-login-page .login-status,
+body.auth-page.voter-register-page .registration-status {
+    padding: 0 1.75rem 1.75rem;
+}
+
+body.auth-page.voter-login-page .message,
+body.auth-page.voter-register-page .message {
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+    font-weight: 600;
+}
+
+body.auth-page.voter-login-page .message.success,
+body.auth-page.voter-register-page .message.success {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+body.auth-page.voter-login-page .message.error,
+body.auth-page.voter-register-page .message.error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+body.auth-page.voter-register-page .auth-header {
+    padding-bottom: 1.2rem;
+}
+
+body.auth-page.voter-register-page .registration-progress {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0 2.1rem 1.6rem;
+}
+
+body.auth-page.voter-register-page .progress-step {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.95rem 1rem;
+    border-radius: 1.15rem;
+    border: 1px solid #dbe7f3;
+    background: #f8fbff;
+    text-align: left;
+}
+
+body.auth-page.voter-register-page .progress-step::before {
+    left: 1rem;
+    right: 1rem;
+    top: auto;
+    bottom: 0;
+    height: 3px;
+    border-radius: 999px;
+    background: #dbe5f1;
+}
+
+body.auth-page.voter-register-page .progress-step:first-child::before,
+body.auth-page.voter-register-page .progress-step:last-child::before {
+    left: 1rem;
+    right: 1rem;
+}
+
+body.auth-page.voter-register-page .step-number {
+    width: 2.4rem;
+    height: 2.4rem;
+    margin: 0;
+    flex-shrink: 0;
+    border: 1px solid #dbe5f1;
+    background: #fff;
+    color: #64748b;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+body.auth-page.voter-register-page .step-label {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+body.auth-page.voter-register-page .progress-step.active {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: #fff;
+    box-shadow: 0 18px 32px rgba(59, 130, 246, 0.08);
+}
+
+body.auth-page.voter-register-page .progress-step.active .step-number {
+    background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
+    border-color: transparent;
+    color: #fff;
+}
+
+body.auth-page.voter-register-page .progress-step.active .step-label {
+    color: #0f172a;
+}
+
+body.auth-page.voter-register-page .progress-step.completed {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+body.auth-page.voter-register-page .progress-step.completed::before {
+    background: #10b981;
+}
+
+body.auth-page.voter-register-page .progress-step.completed .step-number {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+}
+
+body.auth-page.voter-register-page .form-section {
+    padding: 0 2.1rem 0.35rem;
+}
+
+body.auth-page.voter-register-page .form-section h3 {
+    margin-bottom: 1.35rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid #e5edf6;
+    color: #0f172a;
+    font-size: 1.12rem;
+}
+
+body.auth-page.voter-register-page .form-row {
+    gap: 1rem;
+    margin-bottom: 0.1rem;
+}
+
+body.auth-page.voter-register-page .form-help {
+    display: inline-block;
+    margin-top: 0.45rem;
+    color: #64748b;
+    line-height: 1.55;
+}
+
+body.auth-page.voter-register-page .password-strength {
+    margin-top: 0.7rem;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid #dbe7f3;
+    background: #f8fbff;
+}
+
+body.auth-page.voter-register-page .strength-bar {
+    height: 0.38rem;
+    border-radius: 999px;
+}
+
+body.auth-page.voter-register-page .strength-label {
+    margin-top: 0.35rem;
+    color: #64748b;
+}
+
+body.auth-page.voter-register-page .terms-agreement {
+    margin: 1.5rem 0 0;
+    padding: 1rem 1.05rem;
+    border-radius: 1rem;
+    border: 1px solid #dbe7f3;
+    background: #f8fbff;
+}
+
+body.auth-page.voter-register-page .form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.9rem;
+    padding-top: 1.4rem;
+    margin-top: 1.7rem;
+    border-top: 1px solid #e5edf6;
+}
+
+body.auth-page.voter-register-page .form-actions .btn {
+    min-width: 10rem;
+}
+
+body.auth-page.voter-register-page .registration-info {
+    margin: 0 2.1rem 1.5rem;
+    padding: 1.35rem;
+    border-radius: 1.4rem;
+    border: 1px solid #dbe7f3;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef5fc 100%);
+}
+
+body.auth-page.voter-register-page .registration-info h4 {
+    margin-bottom: 1rem;
+    color: #0f172a;
+}
+
+body.auth-page.voter-register-page .registration-info ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+body.auth-page.voter-register-page .registration-info li {
+    margin: 0;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.9);
+    color: #334155;
+}
+
+body.auth-page.voter-register-page .registration-info li i {
+    color: #0ea5e9;
+}
+
+body.auth-page.voter-register-page .success-message {
+    border-radius: 1.35rem;
+    border: 1px solid #a7f3d0;
+    background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%);
+    color: #065f46;
+    box-shadow: 0 18px 35px rgba(16, 185, 129, 0.12);
+}
+
+body.auth-page.voter-register-page .success-message h4 {
+    color: #065f46;
+}
+
+body.auth-page.voter-register-page .success-actions {
+    flex-wrap: wrap;
+}
+
+body.auth-page.voter-register-page .success-actions .btn {
+    min-width: 11rem;
+}
+
+body.auth-page.voter-login-page a:focus-visible,
+body.auth-page.voter-login-page button:focus-visible,
+body.auth-page.voter-login-page input:focus-visible,
+body.auth-page.voter-register-page a:focus-visible,
+body.auth-page.voter-register-page button:focus-visible,
+body.auth-page.voter-register-page input:focus-visible {
+    outline: 3px solid rgba(56, 189, 248, 0.35);
+    outline-offset: 2px;
+}
+
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1180px) {
+    body.auth-page.voter-login-page .auth-layout,
+    body.auth-page.voter-register-page .auth-layout,
+    body.auth-page.voter-register-page .auth-layout.register-layout {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    body.auth-page.voter-register-page .auth-showcase {
+        position: static;
+    }
+
+    body.auth-page.voter-login-page .showcase-panel h1,
+    body.auth-page.voter-register-page .showcase-panel h1 {
+        max-width: 15ch;
+    }
+}
+
+@media (max-width: 860px) {
+    body.auth-page.voter-login-page,
+    body.auth-page.voter-register-page {
+        padding: 1rem;
+    }
+
+    body.auth-page.voter-login-page .auth-layout,
+    body.auth-page.voter-register-page .auth-layout {
+        gap: 1.1rem;
+    }
+
+    body.auth-page.voter-login-page .showcase-grid,
+    body.auth-page.voter-register-page .showcase-grid,
+    body.auth-page.voter-register-page .registration-info ul,
+    body.auth-page.voter-login-page .security-features ul {
+        grid-template-columns: 1fr;
+    }
+
+    body.auth-page.voter-login-page .showcase-card.accent,
+    body.auth-page.voter-register-page .showcase-card.accent {
+        grid-column: span 1;
+    }
+
+    body.auth-page.voter-register-page .registration-progress {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    body.auth-page.voter-login-page .auth-header,
+    body.auth-page.voter-register-page .auth-header,
+    body.auth-page.voter-login-page .auth-tabs,
+    body.auth-page.voter-login-page .auth-form,
+    body.auth-page.voter-register-page .registration-progress,
+    body.auth-page.voter-register-page .form-section,
+    body.auth-page.voter-register-page .registration-info,
+    body.auth-page.voter-login-page .security-features,
+    body.auth-page.voter-login-page .login-status,
+    body.auth-page.voter-register-page .registration-status {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    body.auth-page.voter-login-page .auth-tabs {
+        grid-template-columns: 1fr;
+        padding-bottom: 1.2rem;
+    }
+
+    body.auth-page.voter-register-page .form-row,
+    body.auth-page.voter-register-page .form-actions,
+    body.auth-page.voter-register-page .success-actions {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+
+    body.auth-page.voter-register-page .form-actions .btn,
+    body.auth-page.voter-register-page .success-actions .btn,
+    body.auth-page.voter-login-page .btn,
+    body.auth-page.voter-register-page .btn {
+        width: 100%;
+    }
+
+    body.auth-page.voter-login-page .showcase-panel,
+    body.auth-page.voter-register-page .showcase-panel {
+        padding: 1.6rem;
+    }
+
+    body.auth-page.voter-login-page .showcase-panel h1,
+    body.auth-page.voter-register-page .showcase-panel h1,
+    body.auth-page.voter-login-page .auth-title,
+    body.auth-page.voter-register-page .auth-title {
+        font-size: 2rem;
+    }
+}

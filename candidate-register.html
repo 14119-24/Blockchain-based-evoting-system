@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Portal - Blockchain Voting System</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/candidate-auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api-helper.js"></script>
+</head>
+<body class="auth-page candidate-auth-page" data-candidate-tab="login">
+    <main class="auth-layout candidate-auth-layout">
+    <section class="auth-showcase candidate-showcase">
+        <div class="candidate-showcase-panel">
+            <span class="showcase-kicker">Candidate Portal</span>
+            <h1>Present your candidacy through a cleaner, guided application flow.</h1>
+            <p>Move from sign-in to eligibility review and payment with a calmer, more professional interface built for campaign applicants.</p>
+            <div class="showcase-points">
+                <span><i class="fas fa-user-check"></i> Guided application steps</span>
+                <span><i class="fas fa-file-shield"></i> Clear eligibility review</span>
+                <span><i class="fas fa-mobile-screen-button"></i> Integrated payment confirmation</span>
+            </div>
+        </div>
+        <div class="showcase-grid">
+            <article class="showcase-card">
+                <span class="showcase-card-label">Candidate Login</span>
+                <strong>Access your application workspace without friction</strong>
+                <p>Clean tabs, sharper form states, and clearer recovery options make returning to your portal easier.</p>
+            </article>
+            <article class="showcase-card">
+                <span class="showcase-card-label">Application Review</span>
+                <strong>Track your progress from profile to payment</strong>
+                <p>The registration flow is organized into clear stages so every requirement is easier to complete.</p>
+            </article>
+            <article class="showcase-card accent">
+                <span class="showcase-card-label">Trusted Experience</span>
+                <strong>Professional styling with stronger guidance at every step</strong>
+                <p>From eligibility checks to approval messaging, the portal now feels more official and much easier to use.</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="auth-container candidate-auth-container">
+        <div class="auth-header">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            <div class="auth-brand">
+                <i class="fas fa-vote-yea"></i>
+                <span>BlockVote</span>
+            </div>
+            <h1 class="auth-title">Candidate Portal</h1>
+            <p class="auth-subtitle">Sign in to your workspace or submit your candidacy through a guided application flow</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" onclick="switchTab('login')" id="tab-login">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <button class="tab-btn" onclick="switchTab('register')" id="tab-register">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+            <button class="tab-btn" onclick="switchTab('forgot')" id="tab-forgot">
+                <i class="fas fa-key"></i> Forgot Password
+            </button>
+        </div>
+
+        <!-- Candidate Login Form -->
+        <div class="auth-form active" id="login-form">
+            <form id="candidateLoginForm" onsubmit="loginCandidate(event)">
+                <div class="form-group">
+                    <label for="login-email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="login-email" name="email" required 
+                           placeholder="Enter your registered email">
+                    <div class="error-message" id="login-email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" name="password" required 
+                               placeholder="Enter your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('login')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="login-password-error"></div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" id="candidate-remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password" onclick="switchTab('forgot'); return false;">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login as Candidate
+                </button>
+
+                <div class="auth-links">
+                    <p>Don't have an account? <a href="#" onclick="switchTab('register'); return false;">Register here</a></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Candidate Registration Form -->
+        <div class="auth-form" id="register-form">
+            <div class="candidate-progress" id="candidate-progress">
+                <div class="candidate-progress-step active" data-step="1">
+                    <span class="candidate-step-index">01</span>
+                    <span class="candidate-step-copy">
+                        <strong>Profile</strong>
+                        <small>Personal details</small>
+                    </span>
+                </div>
+                <div class="candidate-progress-step" data-step="2">
+                    <span class="candidate-step-index">02</span>
+                    <span class="candidate-step-copy">
+                        <strong>Eligibility</strong>
+                        <small>Requirements check</small>
+                    </span>
+                </div>
+                <div class="candidate-progress-step" data-step="3">
+                    <span class="candidate-step-index">03</span>
+                    <span class="candidate-step-copy">
+                        <strong>Platform</strong>
+                        <small>Campaign details</small>
+                    </span>
+                </div>
+                <div class="candidate-progress-step" data-step="4">
+                    <span class="candidate-step-index">04</span>
+                    <span class="candidate-step-copy">
+                        <strong>Payment</strong>
+                        <small>Confirm application fee</small>
+                    </span>
+                </div>
+            </div>
+
+            <form id="candidateRegisterForm" class="candidate-register-form" onsubmit="registerCandidate(event)">
+                <!-- Section 1: Personal Information -->
+                <div class="form-section" id="section-1">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="full-name">
+                            <i class="fas fa-id-card"></i> Full Name *
+                        </label>
+                        <input type="text" id="full-name" name="full_name" required 
+                               placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email Address *
+                        </label>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="Enter your email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">
+                            <i class="fas fa-phone"></i> Phone Number *
+                        </label>
+                        <input type="tel" id="phone" name="phone" required 
+                               placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date-of-birth">
+                                <i class="fas fa-birthday-cake"></i> Date of Birth *
+                            </label>
+                            <input type="date" id="date-of-birth" name="date_of_birth" required 
+                                   onchange="checkAge()">
+                            <small id="age-validation" class="validation-note"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="age">
+                                <i class="fas fa-calendar"></i> Age
+                            </label>
+                            <input type="number" id="age" name="age" readonly 
+                                   placeholder="Auto-calculated">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-password">
+                            <i class="fas fa-lock"></i> Password *
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="register-password" name="password" required 
+                                   placeholder="Create a strong password" minlength="8">
+                            <button type="button" class="toggle-password" onclick="togglePassword('register')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small class="field-note">Minimum 8 characters</small>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary" onclick="nextSection(1)">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Section 2: Eligibility Requirements -->
+                <div class="form-section hidden" id="section-2">
+                    <h3><i class="fas fa-check-circle"></i> Eligibility Requirements</h3>
+                    
+                    <div class="eligibility-requirement">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="bsc-degree" name="has_bsc_degree" 
+                                   onchange="validateEligibility()">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>I have a Bachelor's degree (BSc) or equivalent</span>
+                        </label>
+                        <small>Provide proof of degree</small>
+                    </div>
+
+                    <div class="eligibility-requirement">
+                        <label for="party-membership">
+                            <i class="fas fa-users"></i> Political Party Membership *
+                        </label>
+                        <select id="party-membership" name="party" required onchange="validateEligibility()">
+                            <option value="">Select a party</option>
+                            <option value="Progress Party">Progress Party</option>
+                            <option value="Unity Party">Unity Party</option>
+                            <option value="Future Party">Future Party</option>
+                            <option value="Green Alliance">Green Alliance</option>
+                            <option value="Rada Party">Rada Party</option>
+                        </select>
+                    </div>
+
+                    <div class="eligibility-requirement">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="good-conduct" name="good_conduct" 
+                                   onchange="validateEligibility()">
+                            <i class="fas fa-heart"></i>
+                            <span>I confirm I have good conduct and no criminal record</span>
+                        </label>
+                    </div>
+
+                    <div class="eligibility-checklist" id="eligibility-status">
+                        <h4>Eligibility Status:</h4>
+                        <div class="checklist-item">
+                            <i class="fas fa-circle"></i>
+                            <span id="age-check">Age: Must be 21 or older</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-circle"></i>
+                            <span id="degree-check">BSc Degree: Required</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-circle"></i>
+                            <span id="party-check">Party Membership: Required</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-circle"></i>
+                            <span id="conduct-check">Good Conduct: Required</span>
+                        </div>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection(2)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="nextSection(2)">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 3: Party Platform & Payment -->
+                <div class="form-section hidden" id="section-3">
+                    <h3><i class="fas fa-bullhorn"></i> Campaign Platform</h3>
+                    
+                    <div class="form-group">
+                        <label for="campaign-vision">
+                            <i class="fas fa-lightbulb"></i> Campaign Vision & Goals *
+                        </label>
+                        <textarea id="campaign-vision" name="campaign_vision" required rows="4"
+                                  placeholder="Describe your vision and goals for the position"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">
+                            <i class="fas fa-briefcase"></i> Relevant Experience *
+                        </label>
+                        <textarea id="experience" name="experience" required rows="4"
+                                  placeholder="Describe your relevant experience and qualifications"></textarea>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection(2)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextSection(3)">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 4: Payment Information -->
+                <div class="form-section hidden" id="section-4">
+                    <h3><i class="fas fa-mobile-alt"></i> Complete Payment</h3>
+                    
+                    <div class="payment-section">
+                        <div class="fee-info">
+                            <div class="fee-item">
+                                <span>Registration Fee:</span>
+                                <strong>5 Ksh</strong>
+                            </div>
+                            <div class="fee-note">
+                                <i class="fas fa-info-circle"></i>
+                                <p>This non-refundable fee covers the cost of verification and processing of your candidacy.</p>
+                            </div>
+                        </div>
+
+                        <div class="payment-instructions-card">
+                            <h4 class="payment-instructions-title"><i class="fas fa-mobile-alt"></i> Payment Instructions</h4>
+                            <p class="payment-instructions-line"><strong>Payment Method:</strong> M-Pesa, Airtel Money, or similar mobile money service</p>
+                            <p class="payment-instructions-line"><strong>Amount:</strong> 5 Ksh</p>
+                            <ol class="payment-instructions-steps">
+                                <li>Enter your registered phone number below</li>
+                                <li>Click "Send Payment Prompt"</li>
+                                <li>You will receive a payment prompt on your phone</li>
+                                <li>Enter your M-Pesa PIN to complete payment</li>
+                            </ol>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="payment-phone">
+                                <i class="fas fa-phone"></i> Mobile Money Registered Phone Number *
+                            </label>
+                            <input type="tel" id="payment-phone" name="payment_phone" required 
+                                   placeholder="e.g., +254712345678 or 0712345678"
+                                   pattern="[\d\s\-\+\(\)]{9,15}">
+                            <small class="field-note">If left unchanged, we will use the candidate phone number entered above.</small>
+                        </div>
+
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agree-terms" name="agree_terms" required>
+                            <span>I agree to the terms and conditions</span>
+                        </label>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevSection(3)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="sendPaymentPrompt()">
+                            <i class="fas fa-credit-card"></i> Send Payment Prompt
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Candidate Forgot Password Form -->
+        <div class="auth-form" id="forgot-form">
+            <form id="candidateForgotPasswordForm" onsubmit="resetCandidatePassword(event)">
+                <div class="form-group">
+                    <label for="forgot-email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="forgot-email" name="email" required 
+                           placeholder="Enter your registered email">
+                </div>
+
+                <div class="form-group">
+                    <label for="forgot-new-password">
+                        <i class="fas fa-lock"></i> New Password
+                    </label>
+                    <input type="password" id="forgot-new-password" name="new_password" required minlength="8"
+                           placeholder="Enter a new password">
+                </div>
+
+                <div class="form-group">
+                    <label for="forgot-confirm-password">
+                        <i class="fas fa-lock"></i> Confirm New Password
+                    </label>
+                    <input type="password" id="forgot-confirm-password" name="confirm_password" required minlength="8"
+                           placeholder="Confirm your new password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+
+                <div class="auth-links">
+                    <p><a href="#" onclick="switchTab('login'); return false;">Back to Candidate Login</a> | <a href="#" onclick="switchTab('register'); return false;">Open Registration</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="login-status" id="login-status">
+            <!-- Messages will appear here -->
+        </div>
+
+        <!-- Candidate Access Features -->
+        <div class="security-features" style="margin-top: 2rem;">
+            <h3><i class="fas fa-shield-alt"></i> Candidate Access Features</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Secure candidate sign-in</li>
+                <li><i class="fas fa-check-circle"></i> Password recovery support</li>
+                <li><i class="fas fa-check-circle"></i> Dedicated application workflow</li>
+                <li><i class="fas fa-check-circle"></i> Dashboard access after approval</li>
+            </ul>
+        </div>
+    </div>
+    </main>
+
+    <script>
+        let currentSection = 1;
+        let currentTab = 'login';
+
+        function getApiUrl(endpoint) {
+            return '../api/' + endpoint;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.body.setAttribute('data-candidate-tab', tab);
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+            document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+            document.getElementById('tab-forgot').classList.toggle('active', tab === 'forgot');
+            document.getElementById('login-form').classList.toggle('active', tab === 'login');
+            document.getElementById('register-form').classList.toggle('active', tab === 'register');
+            document.getElementById('forgot-form').classList.toggle('active', tab === 'forgot');
+            if (tab === 'register') {
+                updateRegistrationProgress(currentSection);
+            }
+            clearMessages();
+        }
+
+        function updateRegistrationProgress(section = currentSection) {
+            document.querySelectorAll('.candidate-progress-step').forEach((step) => {
+                const stepNumber = Number(step.dataset.step);
+                step.classList.toggle('active', stepNumber === section);
+                step.classList.toggle('completed', stepNumber < section);
+            });
+        }
+
+        function showRegistrationSection(section) {
+            document.querySelectorAll('#candidateRegisterForm .form-section').forEach((formSection) => {
+                formSection.classList.add('hidden');
+            });
+
+            const targetSection = document.getElementById(`section-${section}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                currentSection = section;
+                updateRegistrationProgress(section);
+            }
+        }
+
+        function togglePassword(type) {
+            const passwordField = document.getElementById(`${type}-password`);
+            const toggleBtn = passwordField.nextElementSibling.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleBtn.classList.remove('fa-eye');
+                toggleBtn.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleBtn.classList.remove('fa-eye-slash');
+                toggleBtn.classList.add('fa-eye');
+            }
+        }
+
+        function showMessage(type, message) {
+            const statusDiv = document.getElementById('login-status');
+            statusDiv.innerHTML = `
+                <div class="message ${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            statusDiv.style.display = 'block';
+            if (typeof statusDiv.scrollIntoView === 'function') {
+                statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function clearMessages() {
+            const statusDiv = document.getElementById('login-status');
+            statusDiv.innerHTML = '';
+            statusDiv.style.display = 'none';
+
+            document.querySelectorAll('.error-message').forEach((element) => {
+                element.textContent = '';
+            });
+        }
+
+        function initializeCandidateTab() {
+            const params = new URLSearchParams(window.location.search);
+            const requestedTab = params.get('tab');
+            const supportedTabs = new Set(['login', 'register', 'forgot']);
+            switchTab(supportedTabs.has(requestedTab) ? requestedTab : 'login');
+        }
+
+        function normalizeKenyanPhoneForMpesa(phone) {
+            const digits = String(phone || '').replace(/\D+/g, '');
+
+            if (!digits) {
+                return '';
+            }
+
+            if (digits.length === 12 && digits.startsWith('254')) {
+                return digits;
+            }
+
+            if (digits.length === 10 && digits.startsWith('0')) {
+                return `254${digits.slice(1)}`;
+            }
+
+            if (digits.length === 9 && (digits.startsWith('7') || digits.startsWith('1'))) {
+                return `254${digits}`;
+            }
+
+            return '';
+        }
+
+        function syncPaymentPhoneFromCandidate() {
+            const candidatePhone = document.getElementById('phone').value.trim();
+            const paymentPhoneInput = document.getElementById('payment-phone');
+
+            if (!paymentPhoneInput.value.trim() && candidatePhone) {
+                paymentPhoneInput.value = candidatePhone;
+            }
+        }
+
+        function resolvePaymentPhone() {
+            syncPaymentPhoneFromCandidate();
+
+            const paymentPhoneInput = document.getElementById('payment-phone');
+            const candidatePhone = document.getElementById('phone').value.trim();
+            const rawPhone = paymentPhoneInput.value.trim() || candidatePhone;
+            const normalizedPhone = normalizeKenyanPhoneForMpesa(rawPhone);
+
+            if (!normalizedPhone) {
+                return '';
+            }
+
+            paymentPhoneInput.value = normalizedPhone;
+            return normalizedPhone;
+        }
+
+        function nextSection(current) {
+            if (current === 1) {
+                if (!document.getElementById('full-name').value || 
+                    !document.getElementById('email').value || 
+                    !document.getElementById('phone').value ||
+                    !document.getElementById('date-of-birth').value ||
+                    !document.getElementById('register-password').value) {
+                    showMessage('error', 'Please fill in all required fields');
+                    return;
+                }
+            }
+            
+            if (current === 2) {
+                if (!document.getElementById('bsc-degree').checked) {
+                    showMessage('error', 'You must have a BSc degree to proceed');
+                    return;
+                }
+                if (!document.getElementById('party-membership').value) {
+                    showMessage('error', 'Please select a party');
+                    return;
+                }
+                if (!document.getElementById('good-conduct').checked) {
+                    showMessage('error', 'You must confirm good conduct');
+                    return;
+                }
+            }
+
+            if (current === 3) {
+                if (!document.getElementById('campaign-vision').value || 
+                    !document.getElementById('experience').value) {
+                    showMessage('error', 'Please fill in all campaign information fields');
+                    return;
+                }
+
+                syncPaymentPhoneFromCandidate();
+            }
+
+            showRegistrationSection(current + 1);
+        }
+
+        function prevSection(current) {
+            showRegistrationSection(current - 1);
+        }
+
+        function checkAge() {
+            const dobInput = document.getElementById('date-of-birth').value;
+            if (!dobInput) {
+                document.getElementById('age').value = '';
+                document.getElementById('age-validation').textContent = '';
+                validateEligibility();
+                return;
+            }
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
+
+            if (age < 21) {
+                document.getElementById('age-validation').textContent = '❌ You must be at least 21 years old';
+                document.getElementById('age-validation').style.color = '#ef4444';
+            } else {
+                document.getElementById('age-validation').textContent = '✓ Age requirement met';
+                document.getElementById('age-validation').style.color = '#10b981';
+            }
+
+            validateEligibility();
+        }
+
+        function validateEligibility() {
+            const ageCheck = document.getElementById('age').value >= 21;
+            const degreeCheck = document.getElementById('bsc-degree').checked;
+            const partyCheck = document.getElementById('party-membership').value !== '';
+            const conductCheck = document.getElementById('good-conduct').checked;
+
+            // Update checklist
+            document.getElementById('age-check').innerHTML = 
+                ageCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Age: ✓' : 
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Age: Must be 21+';
+            
+            document.getElementById('degree-check').innerHTML = 
+                degreeCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> BSc Degree: ✓' : 
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> BSc Degree: Required';
+            
+            document.getElementById('party-check').innerHTML = 
+                partyCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Party: ✓' : 
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Party: Required';
+            
+            document.getElementById('conduct-check').innerHTML = 
+                conductCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Good Conduct: ✓' : 
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Good Conduct: Required';
+        }
+
+        async function loginCandidate(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const form = event.target;
+            const formData = {
+                email: form.email.value,
+                password: form.password.value
+            };
+
+            try {
+                const response = await fetch(getApiUrl('candidate-auth.php?action=candidate_login'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', 'Login successful! Redirecting...');
+                    sessionStorage.setItem('candidate_id', data.data.candidate_id);
+                    sessionStorage.setItem('candidate_name', data.data.full_name);
+                    if (document.getElementById('candidate-remember').checked) {
+                        localStorage.setItem('remember_candidate', 'true');
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = 'candidate-dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage('error', data.error || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('error', 'Network error. Please try again.');
+            }
+        }
+
+        // Store form data temporarily for payment processing
+        let tempFormData = null;
+        let paymentCheckInterval = null;
+
+        async function sendPaymentPrompt() {
+            const phoneNumber = resolvePaymentPhone();
+            const agreeTerms = document.getElementById('agree-terms').checked;
+
+            if (!phoneNumber) {
+                showMessage('error', 'Please enter a valid Kenyan mobile money phone number.');
+                return;
+            }
+
+            if (!agreeTerms) {
+                showMessage('error', 'Please agree to the terms and conditions before continuing.');
+                return;
+            }
+
+            // Collect all form data before payment
+            const dob = new Date(document.getElementById('date-of-birth').value);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            
+            if (age < 21) {
+                showMessage('error', 'You must be at least 21 years old to register.');
+                return;
+            }
+
+            if (!document.getElementById('bsc-degree').checked) {
+                showMessage('error', 'A BSc degree is required before proceeding.');
+                return;
+            }
+
+            if (!document.getElementById('good-conduct').checked) {
+                showMessage('error', 'Good conduct confirmation is required before proceeding.');
+                return;
+            }
+
+            // Store form data for later use
+            tempFormData = {
+                full_name: document.getElementById('full-name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('register-password').value,
+                phone: document.getElementById('phone').value,
+                date_of_birth: document.getElementById('date-of-birth').value,
+                party: document.getElementById('party-membership').value,
+                has_bsc_degree: document.getElementById('bsc-degree').checked,
+                good_conduct: document.getElementById('good-conduct').checked,
+                campaign_vision: document.getElementById('campaign-vision').value,
+                experience: document.getElementById('experience').value,
+                payment_phone: phoneNumber,
+                registration_fee: 5,
+                currency: 'KES'
+            };
+
+            // Initiate M-Pesa payment on backend
+            initiateM2Payment(phoneNumber);
+        }
+
+        async function initiateM2Payment(phoneNumber) {
+            try {
+                // Show loading modal
+                showPaymentWaitingModal(phoneNumber);
+
+                // Send payment initiation request to backend
+                const response = await fetch(getApiUrl('candidate-auth.php?action=initiate_mpesa_payment'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone_number: phoneNumber,
+                        amount: 5,
+                        currency: 'KES',
+                        description: 'Candidate Registration Fee',
+                        candidate_data: tempFormData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    tempFormData.payment_transaction_id = data.transaction_id;
+                    showMessage('success', 'Payment prompt sent. Complete the transaction on your phone.');
+                    // Start polling for payment confirmation
+                    startPaymentStatusCheck(data.transaction_id || phoneNumber);
+                } else {
+                    showMessage('error', 'Failed to send payment prompt: ' + (data.error || 'Unknown error'));
+                    closePaymentWaitingModal();
+                }
+            } catch (error) {
+                console.error('Payment initiation error:', error);
+                showMessage('error', 'Network error while sending payment prompt. Please try again.');
+                closePaymentWaitingModal();
+            }
+        }
+
+        function startPaymentStatusCheck(transactionId) {
+            let checkCount = 0;
+            const maxChecks = 120; // 2 minutes with 1-second intervals
+
+            paymentCheckInterval = setInterval(async () => {
+                checkCount++;
+
+                try {
+                    const response = await fetch(getApiUrl('candidate-auth.php?action=check_payment_status'), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            transaction_id: transactionId,
+                            phone_number: tempFormData.payment_phone
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.payment_status === 'completed') {
+                        // Payment successful!
+                        clearInterval(paymentCheckInterval);
+                        closePaymentWaitingModal();
+
+                        tempFormData.payment_transaction_id = data.transaction_id || transactionId;
+                        
+                        // Show success message and register
+                        showMessage('success', 'Payment confirmed. Completing your registration...');
+                        await registerCandidate(tempFormData);
+                    } else if (data.success && data.payment_status === 'cancelled') {
+                        // Payment was cancelled by user
+                        clearInterval(paymentCheckInterval);
+                        closePaymentWaitingModal();
+                        showMessage('error', 'Payment was cancelled. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Payment status check error:', error);
+                }
+
+                // Stop checking after max attempts
+                if (checkCount >= maxChecks) {
+                    clearInterval(paymentCheckInterval);
+                    closePaymentWaitingModal();
+                    showMessage('error', 'Payment prompt timed out. Please try again.');
+                }
+            }, 1000); // Check every 1 second
+        }
+
+        async function registerCandidate(formData) {
+            try {
+                const response = await fetch(getApiUrl('candidate-auth.php?action=candidate_register'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store candidate info in sessionStorage
+                    sessionStorage.setItem('candidate_id', data.data.candidate_id);
+                    sessionStorage.setItem('candidate_name', data.data.full_name);
+                    sessionStorage.setItem('candidate_email', data.data.email);
+                    
+                    // Show pending approval message
+                    showApprovalPendingModal(data.data);
+                } else {
+                    showMessage('error', 'Registration failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('error', 'Network error. Please try again.');
+            }
+        }
+
+        function showPaymentWaitingModal(phoneNumber) {
+            document.getElementById('paymentWaitingModal').classList.add('show');
+            document.getElementById('waitingPhone').textContent = phoneNumber;
+        }
+
+        function closePaymentWaitingModal() {
+            if (paymentCheckInterval) {
+                clearInterval(paymentCheckInterval);
+            }
+            document.getElementById('paymentWaitingModal').classList.remove('show');
+        }
+
+        function cancelPaymentWaiting() {
+            closePaymentWaitingModal();
+            tempFormData = null;
+            showMessage('error', 'Payment cancelled. You can try again whenever you are ready.');
+        }
+
+        function showApprovalPendingModal(candidateData) {
+            document.getElementById('approval-name').textContent = candidateData.full_name || 'Candidate';
+            document.getElementById('approval-email').textContent = candidateData.email;
+            document.getElementById('approval-email-display').textContent = candidateData.email;
+            document.getElementById('approval-candidate-id').textContent = candidateData.candidate_id;
+            document.getElementById('approvalPendingModal').classList.add('show');
+        }
+
+        function approvalGoBack() {
+            window.location.href = 'index.html';
+        }
+
+        function approvalLoginPage() {
+            // Scroll to login tab
+            switchTab('login');
+            document.getElementById('approvalPendingModal').classList.remove('show');
+        }
+
+        function showPaymentModal() {
+            document.getElementById('paymentModal').classList.add('show');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('show');
+        }
+
+        async function resetCandidatePassword(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const form = event.target;
+            const formData = {
+                email: form.email.value,
+                new_password: form.new_password.value,
+                confirm_password: form.confirm_password.value
+            };
+
+            if (formData.new_password !== formData.confirm_password) {
+                showMessage('error', 'Passwords do not match');
+                return;
+            }
+
+            try {
+                const response = await fetch(getApiUrl('candidate-auth.php?action=reset_password'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', 'Password reset successful. You can now log in.');
+                    form.reset();
+                    switchTab('login');
+                } else {
+                    showMessage('error', data.error || 'Password reset failed');
+                }
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showMessage('error', 'Network error. Please try again.');
+            }
+        }
+
+        function checkAge() {
+            const dobInput = document.getElementById('date-of-birth').value;
+            if (!dobInput) {
+                document.getElementById('age').value = '';
+                document.getElementById('age-validation').textContent = '';
+                validateEligibility();
+                return;
+            }
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('age').value = age;
+
+            if (age < 21) {
+                document.getElementById('age-validation').textContent = 'You must be at least 21 years old.';
+                document.getElementById('age-validation').style.color = '#ef4444';
+            } else {
+                document.getElementById('age-validation').textContent = 'Age requirement met.';
+                document.getElementById('age-validation').style.color = '#10b981';
+            }
+
+            validateEligibility();
+        }
+
+        function validateEligibility() {
+            const ageCheck = Number(document.getElementById('age').value) >= 21;
+            const degreeCheck = document.getElementById('bsc-degree').checked;
+            const partyCheck = document.getElementById('party-membership').value !== '';
+            const conductCheck = document.getElementById('good-conduct').checked;
+
+            document.getElementById('age-check').innerHTML =
+                ageCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Age: Eligible' :
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Age: Must be 21 or older';
+
+            document.getElementById('degree-check').innerHTML =
+                degreeCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> BSc Degree: Confirmed' :
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> BSc Degree: Required';
+
+            document.getElementById('party-check').innerHTML =
+                partyCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Party: Selected' :
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Party: Required';
+
+            document.getElementById('conduct-check').innerHTML =
+                conductCheck ? '<i class="fas fa-check-circle" style="color: #10b981;"></i> Good Conduct: Confirmed' :
+                '<i class="fas fa-times-circle" style="color: #ef4444;"></i> Good Conduct: Required';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCandidateTab();
+            showRegistrationSection(currentSection);
+            validateEligibility();
+        });
+
+    </script>
+
+    <style>
+        .form-section {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-section h3 {
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .eligibility-requirement {
+            background: #f0f4ff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+        }
+
+        .checkbox-label input {
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-label span {
+            flex: 1;
+        }
+
+        .eligibility-checklist {
+            background: #f0f9ff;
+            border: 1px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .payment-section {
+            background: #f0f9ff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .fee-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .fee-note {
+            display: flex;
+            gap: 0.75rem;
+            color: var(--gray-color);
+            font-size: 0.875rem;
+        }
+
+        .form-navigation {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: space-between;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .payment-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .payment-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .payment-modal-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-modal-header h2 {
+            color: #2563eb;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .payment-modal-header p {
+            color: var(--gray-color);
+            margin: 0;
+        }
+
+        .payment-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .payment-form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .payment-info {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .payment-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .payment-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-button.primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .payment-button.primary:hover {
+            background: #1d4ed8;
+        }
+
+        .payment-button.secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .payment-button.secondary:hover {
+            background: #d1d5db;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 1.5rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .waiting-icon {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .waiting-icon i {
+            font-size: 3rem;
+            color: #2563eb;
+        }
+    </style>
+
+    <!-- Payment Waiting Modal (M-Pesa prompt on phone) -->
+    <div id="paymentWaitingModal" class="payment-modal">
+        <div class="payment-modal-content">
+            <div class="payment-modal-header">
+                <h2><i class="fas fa-mobile-alt"></i> Waiting for Payment</h2>
+                <p>Complete payment on your phone</p>
+            </div>
+
+            <div class="loader"></div>
+
+            <div class="payment-info">
+                <strong>Phone Number:</strong> <span id="waitingPhone"></span><br>
+                <strong>Amount:</strong> 5 Ksh<br>
+                <strong>Payment Status:</strong> <span style="color: #f59e0b;"><i class="fas fa-hourglass-end"></i> Waiting...</span><br>
+                <p style="margin: 1rem 0; font-size: 0.95rem; color: #1f2937;"><strong>🔔 You should have received a payment prompt on your phone.</strong></p>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--gray-color);">Enter your M-Pesa PIN on your phone to complete the payment. This page will automatically update once payment is confirmed.</p>
+            </div>
+
+            <div style="background: #dbeafe; border-left: 4px solid #2563eb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                <p style="margin: 0; font-size: 0.9rem; color: #1e40af;"><strong><i class="fas fa-info-circle"></i> Did not receive payment prompt?</strong></p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #1e40af;">Ensure your phone number is correct and registered with your mobile money service.</p>
+            </div>
+
+            <div class="payment-buttons">
+                <button type="button" class="payment-button secondary" onclick="cancelPaymentWaiting()">
+                    <i class="fas fa-times"></i> Cancel Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Approval Pending Modal -->
+    <div id="approvalPendingModal" class="payment-modal">
+        <div class="payment-modal-content">
+            <div class="payment-modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h2><i class="fas fa-hourglass-half"></i> Registration Submitted!</h2>
+                <p>Awaiting Admin Approval</p>
+            </div>
+
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                </div>
+                <h3 style="color: #1f2937; margin-bottom: 0.5rem;" id="approval-name">Welcome</h3>
+                <p style="color: var(--gray-color); margin: 0 0 2rem 0;" id="approval-email"></p>
+            </div>
+
+            <div style="background: #f0fdf4; border: 2px solid #10b981; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                <h4 style="color: #166534; margin-top: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> What's Next?
+                </h4>
+                <ol style="color: #166534; margin: 0; padding-left: 1.5rem;">
+                    <li>Your registration has been submitted successfully</li>
+                    <li>An administrator will review your candidacy details</li>
+                    <li>You'll receive an email notification once approved</li>
+                    <li>After approval, you can sign in and access your dashboard</li>
+                </ol>
+            </div>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem; color: #92400e;">
+                    <strong><i class="fas fa-clock"></i> Approval Timeframe:</strong><br>
+                    Typically approved within 24-48 hours
+                </p>
+            </div>
+
+            <div style="background: #eff6ff; border-left: 4px solid #0284c7; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                <p style="margin: 0; font-size: 0.9rem; color: #0c4a6e;">
+                    <strong><i class="fas fa-envelope"></i> Check Your Email:</strong><br>
+                    We'll send updates to <span id="approval-email-display" style="color: #0066cc; font-weight: bold;"></span>
+                </p>
+            </div>
+
+            <div class="payment-buttons">
+                <button type="button" class="payment-button primary" onclick="approvalGoBack()" style="background: #2563eb;">
+                    <i class="fas fa-home"></i> Go to Home
+                </button>
+                <button type="button" class="payment-button secondary" onclick="approvalLoginPage()">
+                    <i class="fas fa-sign-in-alt"></i> Go to Login
+                </button>
+            </div>
+
+            <p style="text-align: center; color: var(--gray-color); font-size: 0.85rem; margin-top: 1rem;">
+                Candidate ID: <code id="approval-candidate-id" style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 0.25rem;"></code>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

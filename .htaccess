@@ -1,0 +1,10 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(?:config|core|database|docs|tests|\.vscode|README\.MD)(?:/|$) - [F,L,NC]
+    RewriteRule \.(?:md|sql|txt|log|ini)$ - [F,L,NC]
+    RewriteRule ^tmp_admin_cookie\.txt$ - [F,L,NC]
+</IfModule>
+

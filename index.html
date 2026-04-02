@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockVote | Secure Election Platform</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/api-helper.js"></script>
+</head>
+<body class="landing-experience">
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-vote-yea"></i>
+                <span>BlockVote</span>
+                <small class="nav-badge">Secure Access</small>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#login" class="nav-link">Login</a>
+                
+                <!-- Voter Navigation (Hidden by default) -->
+                <div id="voter-nav" style="display: none; align-items: center; gap: 1rem;">
+                    <span id="voter-greeting" class="nav-text"></span>
+                    <a href="vote.html" class="btn btn-primary" onclick="goToVoting()">
+                        <i class="fas fa-vote-yea"></i> Continue Voting
+                    </a>
+                    <button onclick="logoutVoter()" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+                
+                <!-- Guest Navigation (Default) -->
+                <div id="guest-nav">
+                    <a href="registration-choice.html" class="nav-link btn-register">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="landing-shell">
+        <section id="home" class="hero-section home-hero">
+            <div class="home-hero-grid">
+                <div class="hero-content reveal-on-scroll">
+                    <div class="hero-eyebrow">
+                        <span class="signal-pill"><i class="fas fa-shield-alt"></i> Verified digital voting</span>
+                        <span class="signal-pill secondary" id="hero-session-state">Guest access is ready</span>
+                    </div>
+                    <span class="hero-kicker">Home for voters and candidates</span>
+                    <p class="hero-subtitle">This homepage is now focused only on the core public paths people actually need when arriving at the platform.</p>
+                    <p class="hero-support">Choose whether you are a voter, candidate, or returning user and move directly into the right page.</p>
+                    <div class="hero-switcher" id="hero-switcher" aria-label="Audience switcher">
+                        <button type="button" class="audience-chip is-active" data-audience="voter" aria-pressed="true">Voters</button>
+                        <button type="button" class="audience-chip" data-audience="candidate" aria-pressed="false">Candidates</button>
+                        <button type="button" class="audience-chip" data-audience="login" aria-pressed="false">Login</button>
+                    </div>
+                    <div class="hero-focus-card reveal-on-scroll" id="hero-focus-card" style="--reveal-delay: 0.06s;">
+                        <div class="hero-focus-head">
+                            <span class="live-label" id="hero-focus-label">Selected workflow</span>
+                            <span class="hero-focus-badge">Quick access</span>
+                        </div>
+                        <h3 id="hero-focus-title">Voter workflow</h3>
+                        <p id="hero-focus-text">Create an account, verify identity, and cast one secure vote.</p>
+                        <div class="hero-focus-points" id="hero-focus-points">
+                            <span>Register</span>
+                            <span>Verify</span>
+                            <span>Vote</span>
+                        </div>
+                        <a href="registration-choice.html" class="btn btn-secondary" id="hero-focus-link">Open voter path</a>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="registration-choice.html" class="btn btn-primary" id="hero-primary-cta">Start Registration</a>
+                        <a href="#login" class="btn btn-secondary" id="hero-secondary-cta">Open Access Links</a>
+                    </div>
+                    <div class="hero-trust-strip">
+                        <span><i class="fas fa-user-check"></i> Voter registration</span>
+                        <span><i class="fas fa-sign-in-alt"></i> Secure login</span>
+                        <span><i class="fas fa-user-tie"></i> Candidate portal</span>
+                    </div>
+                </div>
+                <aside class="hero-stage reveal-on-scroll" style="--reveal-delay: 0.14s;">
+                    <div class="hero-stage-board">
+                        <div class="hero-stage-header">
+                            <div>
+                                <span class="section-kicker">Quick Access</span>
+                                <h3>Go straight to the right page</h3>
+                            </div>
+                            <span class="hero-stage-status"><i class="fas fa-circle"></i> Ready</span>
+                        </div>
+                        <div class="hero-live-grid hero-access-grid">
+                            <a href="registration-choice.html" class="hero-live-card hero-live-link">
+                                <span class="live-label">Voter</span>
+                                <strong>Register</strong>
+                                <small>Create a new voter account</small>
+                            </a>
+                            <a href="login.html" class="hero-live-card hero-live-link">
+                                <span class="live-label">Voter</span>
+                                <strong>Login</strong>
+                                <small>Return to the voting desk</small>
+                            </a>
+                            <a href="candidate-register.html?tab=register" class="hero-live-card hero-live-link accent">
+                                <span class="live-label">Candidate</span>
+                                <strong>Apply</strong>
+                                <small>Open the candidate portal</small>
+                            </a>
+                            <a href="candidate-register.html?tab=login" class="hero-live-card hero-live-link">
+                                <span class="live-label">Candidate</span>
+                                <strong>Login</strong>
+                                <small>Return to your dashboard</small>
+                            </a>
+                        </div>
+                        <div class="hero-stage-layers">
+                            <article class="stage-layer-card">
+                                <span>Home</span>
+                                <strong>A simpler landing page with less distraction and clearer navigation.</strong>
+                            </article>
+                            <article class="stage-layer-card">
+                                <span>About</span>
+                                <strong>A short explanation of what the platform does and how the process works.</strong>
+                            </article>
+                            <article class="stage-layer-card">
+                                <span>Access</span>
+                                <strong>Separate routes for voter registration, voter login, candidate application, and candidate login.</strong>
+                            </article>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="about" class="landing-pathways">
+            <div class="section-heading section-heading-split">
+                <div>
+                    <span class="section-kicker">About</span>
+                    <h2 class="section-title">What BlockVote is meant to do</h2>
+                </div>
+                <p class="section-intro reveal-on-scroll">This public homepage now explains the platform briefly and focuses only on voter access, candidate access, and returning logins.</p>
+            </div>
+            <div class="pathway-grid">
+                <article class="pathway-card reveal-on-scroll" style="--reveal-delay: 0.04s;">
+                    <div class="pathway-icon"><i class="fas fa-shield-alt"></i></div>
+                    <span class="pathway-label">Trusted Access</span>
+                    <h3>Secure entry for every voter</h3>
+                    <p>The platform is designed so voters register first, get verified, and then move into the ballot in a controlled way.</p>
+                    <div class="pathway-points">
+                        <span>Registration</span>
+                        <span>Verification</span>
+                        <span>Voting</span>
+                    </div>
+                </article>
+                <article class="pathway-card reveal-on-scroll" style="--reveal-delay: 0.08s;">
+                    <div class="pathway-icon"><i class="fas fa-compass"></i></div>
+                    <span class="pathway-label">Simple Navigation</span>
+                    <h3>A homepage with fewer distractions</h3>
+                    <p>Only the important public paths remain here so new users can understand where to go in a few seconds.</p>
+                    <div class="pathway-points">
+                        <span>Home</span>
+                        <span>About</span>
+                        <span>Access</span>
+                    </div>
+                </article>
+                <article class="pathway-card reveal-on-scroll" style="--reveal-delay: 0.12s;">
+                    <div class="pathway-icon"><i class="fas fa-user-tie"></i></div>
+                    <span class="pathway-label">Candidate Access</span>
+                    <h3>Clear entry for candidates too</h3>
+                    <p>Candidates can either begin a new application or return through their own login path without competing with other content.</p>
+                    <div class="pathway-points">
+                        <span>Apply</span>
+                        <span>Login</span>
+                        <span>Dashboard</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="login" class="features-section">
+            <div class="section-heading section-heading-split">
+                <div>
+                    <span class="section-kicker">Login And Access</span>
+                    <h2 class="section-title">Choose the page you need</h2>
+                </div>
+                <p class="section-intro reveal-on-scroll">These are the only public actions this homepage should emphasize: voter registration, voter login, candidate registration, and candidate login.</p>
+            </div>
+            <div class="features-grid">
+                <article class="feature-card reveal-on-scroll" style="--reveal-delay: 0.05s;">
+                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                    <h3 class="feature-title">Voter registration</h3>
+                    <p class="feature-description">Create a new voter account and begin the approval process.</p>
+                    <a href="registration-choice.html" class="btn btn-secondary">Register as voter</a>
+                </article>
+                <article class="feature-card reveal-on-scroll" style="--reveal-delay: 0.1s;">
+                    <div class="feature-icon"><i class="fas fa-sign-in-alt"></i></div>
+                    <h3 class="feature-title">Voter login</h3>
+                    <p class="feature-description">Return to your account and continue to the voting interface.</p>
+                    <a href="login.html" class="btn btn-secondary">Voter login</a>
+                </article>
+                <article class="feature-card reveal-on-scroll" style="--reveal-delay: 0.15s;">
+                    <div class="feature-icon"><i class="fas fa-user-plus"></i></div>
+                    <h3 class="feature-title">Candidate application</h3>
+                    <p class="feature-description">Open the candidate portal and submit a new application.</p>
+                    <a href="candidate-register.html?tab=register" class="btn btn-secondary">Candidate register</a>
+                </article>
+                <article class="feature-card reveal-on-scroll" style="--reveal-delay: 0.2s;">
+                    <div class="feature-icon"><i class="fas fa-id-badge"></i></div>
+                    <h3 class="feature-title">Candidate login</h3>
+                    <p class="feature-description">Approved candidates can return directly to their dashboard.</p>
+                    <a href="candidate-register.html?tab=login" class="btn btn-secondary">Candidate login</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="landing-cta reveal-on-scroll">
+            <div class="landing-cta-copy">
+                <span class="section-kicker">Start Here</span>
+                <h2>Use the homepage only for what matters most.</h2>
+                <p>Home, about, voter access, candidate access, and login are now the only things emphasized here.</p>
+            </div>
+            <div class="landing-cta-actions">
+                <a href="registration-choice.html" class="btn btn-primary">Register to vote</a>
+                <a href="login.html" class="btn btn-secondary">Open login</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-card footer-brand-card">
+                <div class="footer-brand-line">
+                    <i class="fas fa-vote-yea"></i>
+                    <div>
+                        <h3>BlockVote</h3>
+                        <p class="footer-tagline">Simple public access for voters and candidates.</p>
+                    </div>
+                </div>
+                <p class="footer-note">A cleaner public interface for home, about, voter access, candidate access, and secure login.</p>
+            </div>
+            <div class="footer-card">
+                <h3>Explore</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#login">Login</a></li>
+                </ul>
+            </div>
+            <div class="footer-card">
+                <h3>Access</h3>
+                <ul>
+                    <li><a href="login.html">Voter login</a></li>
+                    <li><a href="registration-choice.html">Voter registration</a></li>
+                    <li><a href="candidate-register.html?tab=register">Candidate registration</a></li>
+                    <li><a href="candidate-register.html?tab=login">Candidate login</a></li>
+                </ul>
+            </div>
+            <div class="footer-card">
+                <h3>Contact</h3>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> <a href="mailto:810egh@gmail.com">810egh@gmail.com</a></li>
+                    <li><i class="fas fa-phone"></i> <a href="tel:0725830819">0725830819</a></li>
+                    <li><i class="fas fa-map-marker-alt"></i> Computer Science Department</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="footer-year"></span> BlockVote. Secure and transparent blockchain voting.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        let currentVoter = null;
+        let ledgerBlocks = [];
+        let currentLedgerView = 'latest';
+        let revealObserver = null;
+        let sectionObserver = null;
+        const statState = new Map();
+        const audienceProfiles = {
+            voter: {
+                title: 'Voter workflow',
+                text: 'Register, complete verification, and cast one secure vote with a visible receipt path.',
+                points: ['Controlled signup', 'Verified ballot', 'Recorded receipt'],
+                href: 'registration-choice.html',
+                action: 'Open voter route'
+            },
+            candidate: {
+                title: 'Candidate workflow',
+                text: 'Apply, complete approval, and return to a clearer campaign dashboard experience.',
+                points: ['Eligibility path', 'Approval status', 'Campaign return'],
+                href: 'candidate-register.html?tab=register',
+                action: 'Open candidate route'
+            },
+            login: {
+                title: 'Login access',
+                text: 'Return to your voter account or candidate dashboard through the correct secure login page.',
+                points: ['Voter login', 'Candidate login', 'Secure return'],
+                href: 'login.html',
+                action: 'Open login page'
+            }
+        };
+
+        // Helper function to get API URL
+        function getApiUrl(endpoint) {
+            return '../api/' + endpoint;
+        }
+
+        function setTextIfPresent(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function formatLedgerTimestamp(value) {
+            const timestamp = Date.parse(value);
+            if (!timestamp) {
+                return 'Awaiting blocks';
+            }
+
+            return new Date(timestamp).toLocaleString([], {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function updateLedgerAvailability(isAvailable) {
+            const statePill = document.getElementById('ledger-chain-state');
+            if (statePill) {
+                statePill.textContent = isAvailable ? 'Verified' : 'Unavailable';
+                statePill.classList.toggle('success', isAvailable);
+                statePill.classList.toggle('warning', !isAvailable);
+            }
+
+            setTextIfPresent(
+                'ledger-integrity-status',
+                isAvailable ? 'Verified and auditable' : 'Ledger temporarily unavailable'
+            );
+        }
+
+        function stampLedgerRefresh(label) {
+            const defaultLabel = `Updated ${new Date().toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit'
+            })}`;
+            setTextIfPresent('ledger-last-refresh', label || defaultLabel);
+        }
+
+        function updateLedgerViewButtons() {
+            document.querySelectorAll('.ledger-view-chip').forEach((button) => {
+                const isActive = button.dataset.view === currentLedgerView;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+
+        function renderLedgerBlocks() {
+            const container = document.getElementById('blocks-list');
+            if (!container) {
+                return;
+            }
+
+            if (!ledgerBlocks.length) {
+                setTextIfPresent('ledger-feed-note', 'No ledger records have been created yet.');
+                setTextIfPresent('ledger-current-view', 'Waiting for blocks');
+                setTextIfPresent('ledger-activity-window', 'No block window loaded yet');
+                container.innerHTML = `
+                    <div class="no-blocks reveal-on-scroll">
+                        <i class="fas fa-database"></i>
+                        <strong>No blocks recorded yet</strong>
+                        <span>The verified ledger feed will populate here once the first sealed record is written.</span>
+                    </div>
+                `;
+                observeRevealElements(container);
+                return;
+            }
+
+            const newestFirst = [...ledgerBlocks].sort((a, b) => {
+                const timeDifference = (Date.parse(b.timestamp) || 0) - (Date.parse(a.timestamp) || 0);
+                if (timeDifference !== 0) {
+                    return timeDifference;
+                }
+
+                return (Number(b.block_id) || 0) - (Number(a.block_id) || 0);
+            });
+
+            const viewSettings = {
+                latest: {
+                    blocks: newestFirst.slice(0, 5),
+                    title: 'Latest blocks',
+                    note: 'Showing the newest sealed records from the chain.'
+                },
+                'high-activity': {
+                    blocks: [...newestFirst]
+                        .sort((a, b) => {
+                            const transactionDifference = (Number(b.transactions_count) || 0) - (Number(a.transactions_count) || 0);
+                            if (transactionDifference !== 0) {
+                                return transactionDifference;
+                            }
+
+                            return (Number(b.block_id) || 0) - (Number(a.block_id) || 0);
+                        })
+                        .slice(0, 5),
+                    title: 'Highest activity blocks',
+                    note: 'Showing the busiest recently recorded blocks by transaction volume.'
+                },
+                extended: {
+                    blocks: newestFirst.slice(0, 8),
+                    title: 'Extended ledger view',
+                    note: 'Showing a wider inspection window for recent chain activity.'
+                }
+            };
+
+            const activeView = viewSettings[currentLedgerView] || viewSettings.latest;
+            const visibleBlocks = activeView.blocks;
+            const highestTransactionCount = Math.max(...visibleBlocks.map((block) => Number(block.transactions_count) || 0), 1);
+            const newestVisibleBlock = visibleBlocks[0];
+            const oldestVisibleBlock = visibleBlocks[visibleBlocks.length - 1];
+
+            setTextIfPresent('ledger-feed-note', activeView.note);
+            setTextIfPresent('ledger-current-view', activeView.title);
+            setTextIfPresent(
+                'ledger-activity-window',
+                visibleBlocks.length > 1
+                    ? `Blocks #${oldestVisibleBlock.block_id} to #${newestVisibleBlock.block_id}`
+                    : `Block #${newestVisibleBlock.block_id}`
+            );
+
+            container.innerHTML = visibleBlocks.map((block, index) => {
+                const transactions = Number(block.transactions_count) || 0;
+                const intensity = Math.max(18, Math.round((transactions / highestTransactionCount) * 100));
+                const hashValue = String(block.block_hash || '');
+                const hashPreview = hashValue.length > 24
+                    ? `${hashValue.substring(0, 14)}...${hashValue.substring(hashValue.length - 8)}`
+                    : (hashValue || 'Hash unavailable');
+
+                return `
+                    <article class="block-item reveal-on-scroll" style="--reveal-delay: ${index * 0.05}s;">
+                        <div class="block-main">
+                            <div class="block-column block-column-primary">
+                                <span class="block-column-label">Block</span>
+                                <strong class="block-number">#${block.block_id}</strong>
+                            </div>
+                            <div class="block-column">
+                                <span class="block-column-label">Seal time</span>
+                                <span class="block-time">${formatLedgerTimestamp(block.timestamp)}</span>
+                            </div>
+                            <div class="block-column block-column-hash">
+                                <span class="block-column-label">Hash preview</span>
+                                <code class="hash-value" title="${hashValue || 'Hash unavailable'}">${hashPreview}</code>
+                            </div>
+                            <div class="block-column block-column-metric">
+                                <span class="block-column-label">Transactions</span>
+                                <strong class="block-transaction-count">${transactions}</strong>
+                            </div>
+                        </div>
+                        <div class="block-strength">
+                            <span>Share of peak activity in this view</span>
+                            <strong>${intensity}%</strong>
+                        </div>
+                        <div class="block-strength-bar">
+                            <span style="width: ${intensity}%"></span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            observeRevealElements(container);
+        }
+
+        function setLedgerView(view) {
+            currentLedgerView = view;
+            updateLedgerViewButtons();
+            renderLedgerBlocks();
+        }
+
+        function animateStatValue(element, target) {
+            if (!element) return;
+
+            const nextValue = Number(target) || 0;
+            const currentValue = statState.has(element.id)
+                ? statState.get(element.id)
+                : Number(String(element.textContent).replace(/,/g, '')) || 0;
+
+            if (currentValue === nextValue) {
+                element.textContent = nextValue.toLocaleString();
+                return;
+            }
+
+            const startTime = performance.now();
+            const duration = 800;
+
+            function frame(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const value = Math.round(currentValue + ((nextValue - currentValue) * eased));
+
+                element.textContent = value.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(frame);
+                } else {
+                    statState.set(element.id, nextValue);
+                }
+            }
+
+            requestAnimationFrame(frame);
+        }
+
+        function updateHeroAccessState() {
+            const sessionState = document.getElementById('hero-session-state');
+            const primaryCta = document.getElementById('hero-primary-cta');
+
+            if (currentVoter) {
+                if (sessionState) {
+                    sessionState.innerHTML = '<i class="fas fa-check-circle"></i> Voter session detected';
+                }
+
+                if (primaryCta) {
+                    primaryCta.href = 'vote.html';
+                    primaryCta.innerHTML = 'Open Voting Desk';
+                }
+
+                setAudienceProfile(
+                    document.querySelector('.audience-chip.is-active')?.dataset.audience || 'voter'
+                );
+                return;
+            }
+
+            if (sessionState) {
+                sessionState.innerHTML = '<i class="fas fa-door-open"></i> Guest access is ready';
+            }
+
+            if (primaryCta) {
+                primaryCta.href = 'registration-choice.html';
+                primaryCta.innerHTML = 'Start Registration';
+            }
+
+            setAudienceProfile(
+                document.querySelector('.audience-chip.is-active')?.dataset.audience || 'voter'
+            );
+        }
+
+        function setAudienceProfile(audience) {
+            const baseProfile = audienceProfiles[audience] || audienceProfiles.voter;
+            const profile = audience === 'voter' && currentVoter
+                ? {
+                    ...baseProfile,
+                    text: 'Open your ballot, cast your vote, and check your receipt.',
+                    href: 'vote.html',
+                    action: 'Open voting desk'
+                }
+                : baseProfile;
+            const focusCard = document.getElementById('hero-focus-card');
+            const focusTitle = document.getElementById('hero-focus-title');
+            const focusText = document.getElementById('hero-focus-text');
+            const focusPoints = document.getElementById('hero-focus-points');
+            const focusLink = document.getElementById('hero-focus-link');
+
+            document.querySelectorAll('.audience-chip').forEach((chip) => {
+                const isActive = chip.dataset.audience === audience;
+                chip.classList.toggle('is-active', isActive);
+                chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+
+            if (focusCard) {
+                focusCard.classList.remove('is-swapping');
+                void focusCard.offsetWidth;
+                focusCard.classList.add('is-swapping');
+            }
+
+            if (focusTitle) {
+                focusTitle.textContent = profile.title;
+            }
+
+            if (focusText) {
+                focusText.textContent = profile.text;
+            }
+
+            if (focusPoints) {
+                focusPoints.innerHTML = profile.points
+                    .map((point) => `<span>${point}</span>`)
+                    .join('');
+            }
+
+            if (focusLink) {
+                focusLink.href = profile.href;
+                focusLink.textContent = profile.action;
+            }
+        }
+
+        function setupAudienceSwitcher() {
+            const chips = Array.from(document.querySelectorAll('.audience-chip'));
+
+            if (!chips.length) {
+                return;
+            }
+
+            chips.forEach((chip, index) => {
+                chip.addEventListener('click', () => {
+                    setAudienceProfile(chip.dataset.audience);
+                });
+
+                chip.addEventListener('keydown', (event) => {
+                    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const direction = event.key === 'ArrowRight' ? 1 : -1;
+                    const nextIndex = (index + direction + chips.length) % chips.length;
+                    chips[nextIndex].focus();
+                    setAudienceProfile(chips[nextIndex].dataset.audience);
+                });
+            });
+
+            setAudienceProfile(chips.find((chip) => chip.classList.contains('is-active'))?.dataset.audience || 'voter');
+        }
+
+        function observeRevealElements(root = document) {
+            const revealItems = root.querySelectorAll('.reveal-on-scroll');
+
+            if (!revealObserver) {
+                revealItems.forEach((item) => item.classList.add('is-visible'));
+                return;
+            }
+
+            revealItems.forEach((item) => {
+                if (item.dataset.revealBound === 'true') {
+                    return;
+                }
+
+                item.dataset.revealBound = 'true';
+                revealObserver.observe(item);
+            });
+        }
+
+        function setupRevealAnimations() {
+            if (!('IntersectionObserver' in window)) {
+                document.querySelectorAll('.reveal-on-scroll').forEach((item) => {
+                    item.classList.add('is-visible');
+                });
+                return;
+            }
+
+            revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
+
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -10% 0px'
+            });
+
+            observeRevealElements();
+        }
+
+        function setupActiveNavTracking() {
+            const navLinks = Array.from(document.querySelectorAll('.nav-link[href^="#"]'));
+            const sections = navLinks
+                .map((link) => document.querySelector(link.getAttribute('href')))
+                .filter(Boolean);
+
+            if (!navLinks.length || !sections.length || !('IntersectionObserver' in window)) {
+                return;
+            }
+
+            const visibility = new Map(sections.map((section) => [section.id, 0]));
+
+            sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    visibility.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+                });
+
+                const activeId = [...visibility.entries()]
+                    .sort((a, b) => b[1] - a[1])[0]?.[0] || 'home';
+
+                navLinks.forEach((link) => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+                });
+            }, {
+                threshold: [0.2, 0.4, 0.6],
+                rootMargin: '-25% 0px -45% 0px'
+            });
+
+            sections.forEach((section) => sectionObserver.observe(section));
+        }
+
+        function setupLandingExperience() {
+            setupRevealAnimations();
+            setupActiveNavTracking();
+            setupAudienceSwitcher();
+            setupHeroMotion();
+            setupInteractivePanels();
+        }
+
+        function setupHeroMotion() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            const hero = document.querySelector('.home-hero');
+            const stageBoard = document.querySelector('.hero-stage-board');
+            const focusCard = document.getElementById('hero-focus-card');
+
+            if (!hero) {
+                return;
+            }
+
+            const updateHero = (clientX, clientY) => {
+                const rect = hero.getBoundingClientRect();
+                if (!rect.width || !rect.height) {
+                    return;
+                }
+
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                const rotateY = ((x / rect.width) - 0.5) * 10;
+                const rotateX = (0.5 - (y / rect.height)) * 8;
+
+                hero.style.setProperty('--hero-glow-x', `${(x / rect.width) * 100}%`);
+                hero.style.setProperty('--hero-glow-y', `${(y / rect.height) * 100}%`);
+
+                if (stageBoard) {
+                    stageBoard.style.transform = `perspective(1200px) rotateX(${rotateX * 0.42}deg) rotateY(${rotateY * 0.52}deg) translateY(-2px)`;
+                }
+
+                if (focusCard) {
+                    focusCard.style.transform = `translate3d(${rotateY * 0.18}px, ${rotateX * -0.18}px, 0)`;
+                }
+            };
+
+            hero.addEventListener('pointermove', (event) => {
+                updateHero(event.clientX, event.clientY);
+            });
+
+            hero.addEventListener('pointerleave', () => {
+                hero.style.setProperty('--hero-glow-x', '72%');
+                hero.style.setProperty('--hero-glow-y', '18%');
+
+                if (stageBoard) {
+                    stageBoard.style.transform = '';
+                }
+
+                if (focusCard) {
+                    focusCard.style.transform = '';
+                }
+            });
+        }
+
+        function setupInteractivePanels() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            const panels = document.querySelectorAll(
+                '.pathway-card, .briefing-card, .feature-card, .election-card, .action-card, .block-item, .hero-live-card, .stage-layer-card, .timeline-node'
+            );
+
+            panels.forEach((panel) => {
+                panel.addEventListener('pointermove', (event) => {
+                    const rect = panel.getBoundingClientRect();
+                    if (!rect.width || !rect.height) {
+                        return;
+                    }
+
+                    const x = event.clientX - rect.left;
+                    const y = event.clientY - rect.top;
+                    const rotateY = ((x / rect.width) - 0.5) * 7;
+                    const rotateX = (0.5 - (y / rect.height)) * 6;
+
+                    panel.style.setProperty('--panel-glow-x', `${(x / rect.width) * 100}%`);
+                    panel.style.setProperty('--panel-glow-y', `${(y / rect.height) * 100}%`);
+                    panel.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+                });
+
+                panel.addEventListener('pointerleave', () => {
+                    panel.style.transform = '';
+                    panel.style.removeProperty('--panel-glow-x');
+                    panel.style.removeProperty('--panel-glow-y');
+                });
+            });
+        }
+
+        // Check if voter is logged in
+        async function checkVoterAuth() {
+            try {
+                const response = await fetch(getApiUrl('auth.php?action=check_session'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data.user_type === 'voter') {
+                    currentVoter = data.data;
+                    showVoterNav();
+                    return true;
+                } else {
+                    showGuestNav();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                showGuestNav();
+                return false;
+            }
+        }
+
+        function showVoterNav() {
+            document.getElementById('voter-nav').style.display = 'flex';
+            document.getElementById('guest-nav').style.display = 'none';
+            
+            if (currentVoter) {
+                document.getElementById('voter-greeting').textContent = 
+                    `Welcome, ${currentVoter.full_name || 'Voter'}!`;
+            }
+
+            updateHeroAccessState();
+        }
+
+        function showGuestNav() {
+            document.getElementById('voter-nav').style.display = 'none';
+            document.getElementById('guest-nav').style.display = 'flex';
+            updateHeroAccessState();
+        }
+
+        function goToVoting() {
+            window.location.href = 'vote.html';
+        }
+
+        function logoutVoter() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch(getApiUrl('auth.php?action=logout'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(() => {
+                    currentVoter = null;
+                    showGuestNav();
+                    window.location.href = 'index.html';
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+        
+        // Load blockchain stats
+        async function loadStats() {
+            try {
+                const response = await fetch(getApiUrl('admin.php?action=get_blockchain_stats'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        const stats = data.data.blockchain_stats || {};
+                        const totalBlocks = Number(stats.total_blocks) || 0;
+                        const totalTransactions = Number(stats.total_transactions) || 0;
+                        const averageTransactions = totalBlocks > 0
+                            ? Math.round(totalTransactions / totalBlocks)
+                            : 0;
+
+                        animateStatValue(
+                            document.getElementById('total-blocks'),
+                            totalBlocks
+                        );
+                        animateStatValue(
+                            document.getElementById('total-votes'),
+                            totalTransactions
+                        );
+                        animateStatValue(
+                            document.getElementById('hero-live-blocks'),
+                            totalBlocks
+                        );
+                        animateStatValue(
+                            document.getElementById('ledger-total-blocks'),
+                            totalBlocks
+                        );
+                        animateStatValue(
+                            document.getElementById('ledger-total-transactions'),
+                            totalTransactions
+                        );
+                        animateStatValue(
+                            document.getElementById('ledger-average-transactions'),
+                            averageTransactions
+                        );
+                        document.getElementById('hero-live-chain').textContent =
+                            stats.available === false
+                                ? 'Ledger status temporarily unavailable'
+                                : `Latest block ${stats.latest_block ? String(stats.latest_block.block_hash).substring(0, 10) + '...' : 'ready'}`;
+                        document.getElementById('hero-session-state').classList.toggle('secondary', !currentVoter);
+                        updateLedgerAvailability(stats.available !== false);
+
+                        if (stats.latest_block) {
+                            setTextIfPresent(
+                                'ledger-latest-hash',
+                                `${String(stats.latest_block.block_hash || '').substring(0, 22)}...`
+                            );
+
+                            if (stats.latest_block.timestamp) {
+                                setTextIfPresent(
+                                    'ledger-latest-time',
+                                    formatLedgerTimestamp(stats.latest_block.timestamp)
+                                );
+                            }
+                        }
+                        
+                        // Load elections count
+                        const electionsResponse = await fetch(getApiUrl('admin.php?action=get_elections'), {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (electionsResponse.ok) {
+                            const electionsData = await electionsResponse.json();
+                            if (electionsData.success) {
+                                animateStatValue(
+                                    document.getElementById('total-elections'),
+                                    electionsData.data.count
+                                );
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                updateLedgerAvailability(false);
+                setTextIfPresent('ledger-integrity-status', 'Unable to read chain status');
+            }
+        }
+        
+        // Load current elections
+        async function loadCurrentElections() {
+            try {
+                const response = await fetch(getApiUrl('admin.php?action=get_elections'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'ongoing' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('current-elections');
+                    
+                    if (data.success && data.data.elections.length > 0) {
+                        animateStatValue(
+                            document.getElementById('hero-live-elections'),
+                            data.data.elections.length
+                        );
+                        animateStatValue(
+                            document.getElementById('ledger-active-elections'),
+                            data.data.elections.length
+                        );
+                        document.getElementById('hero-live-message').textContent =
+                            `${data.data.elections[0].election_name} is currently open`;
+                        container.innerHTML = data.data.elections.map((election, index) => `
+                            <div class="election-card reveal-on-scroll" style="--reveal-delay: ${index * 0.08}s;">
+                                <div class="election-header">
+                                    <h3>${election.election_name}</h3>
+                                    <span class="election-status status-${election.status}">
+                                        ${election.status}
+                                    </span>
+                                </div>
+                                <p class="election-description">${election.description || 'No description'}</p>
+                                <div class="election-details">
+                                    <div class="detail">
+                                        <i class="fas fa-calendar-start"></i>
+                                        <span>Starts: ${new Date(election.start_date).toLocaleDateString()}</span>
+                                    </div>
+                                    <div class="detail">
+                                        <i class="fas fa-calendar-end"></i>
+                                        <span>Ends: ${new Date(election.end_date).toLocaleDateString()}</span>
+                                    </div>
+                                    <div class="detail">
+                                        <i class="fas fa-users"></i>
+                                        <span>Candidates: ${election.candidate_count}</span>
+                                    </div>
+                                </div>
+                                <a href="vote.html?election=${election.election_id}" class="btn-vote-now">
+                                    <i class="fas fa-vote-yea"></i> Vote Now
+                                </a>
+                            </div>
+                        `).join('');
+                        observeRevealElements(container);
+                    } else {
+                        animateStatValue(
+                            document.getElementById('hero-live-elections'),
+                            0
+                        );
+                        animateStatValue(
+                            document.getElementById('ledger-active-elections'),
+                            0
+                        );
+                        document.getElementById('hero-live-message').textContent = 'No live elections right now';
+                        container.innerHTML = `
+                            <div class="no-elections reveal-on-scroll">
+                                <i class="fas fa-calendar-times"></i>
+                                <h3>No Active Elections</h3>
+                                <p>Check back later for upcoming elections</p>
+                            </div>
+                        `;
+                        observeRevealElements(container);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading elections:', error);
+                animateStatValue(
+                    document.getElementById('ledger-active-elections'),
+                    0
+                );
+            }
+        }
+        
+        // Load recent blocks
+        async function loadRecentBlocks() {
+            try {
+                const response = await fetch(getApiUrl('blocks.php'));
+                if (response.ok) {
+                    const blocks = await response.json();
+                    ledgerBlocks = Array.isArray(blocks) ? blocks : [];
+                    
+                    if (ledgerBlocks.length > 0) {
+                        const newestBlocks = [...ledgerBlocks].sort((a, b) => {
+                            const timeDifference = (Date.parse(b.timestamp) || 0) - (Date.parse(a.timestamp) || 0);
+                            if (timeDifference !== 0) {
+                                return timeDifference;
+                            }
+
+                            return (Number(b.block_id) || 0) - (Number(a.block_id) || 0);
+                        });
+                        const latestBlock = newestBlocks[0];
+                        document.getElementById('hero-live-chain').textContent =
+                            `Latest block #${latestBlock.block_id} synced`;
+                        setTextIfPresent(
+                            'ledger-latest-hash',
+                            `${String(latestBlock.block_hash || '').substring(0, 22)}...`
+                        );
+                        setTextIfPresent(
+                            'ledger-latest-time',
+                            formatLedgerTimestamp(latestBlock.timestamp)
+                        );
+                        stampLedgerRefresh();
+                        renderLedgerBlocks();
+                    } else {
+                        document.getElementById('hero-live-chain').textContent = 'Awaiting first block';
+                        setTextIfPresent('ledger-latest-hash', 'Awaiting first recorded block');
+                        setTextIfPresent('ledger-latest-time', 'Awaiting blocks');
+                        stampLedgerRefresh('Waiting for the first block');
+                        renderLedgerBlocks();
+                    }
+                } else {
+                    throw new Error(`Failed to fetch blocks: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error loading blocks:', error);
+                ledgerBlocks = [];
+                stampLedgerRefresh('Refresh failed');
+                renderLedgerBlocks();
+                const container = document.getElementById('blocks-list');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="no-blocks reveal-on-scroll">
+                            <i class="fas fa-triangle-exclamation"></i>
+                            <strong>Ledger data is unavailable right now</strong>
+                            <span>Refresh the workspace to try loading the latest verified records again.</span>
+                        </div>
+                    `;
+                    observeRevealElements(container);
+                }
+                setTextIfPresent('ledger-feed-note', 'Unable to load the ledger right now. Refresh to try again.');
+                setTextIfPresent('ledger-current-view', 'Unavailable');
+                setTextIfPresent('ledger-activity-window', 'Refresh to retry');
+            }
+        }
+        
+        function refreshBlockchain() {
+            const refreshButton = document.querySelector('.ledger-primary-action.btn-refresh');
+            refreshButton?.classList.add('is-spinning');
+            setTimeout(() => refreshButton?.classList.remove('is-spinning'), 700);
+            loadRecentBlocks();
+            loadStats();
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const footerYear = document.getElementById('footer-year');
+            if (footerYear) {
+                footerYear.textContent = new Date().getFullYear();
+            }
+
+            // Check if voter is logged in
+            await checkVoterAuth();
+            setupLandingExperience();
+            updateHeroAccessState();
+        });
+    </script>
+</body>
+</html>

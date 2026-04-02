@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Registration Type - BlockVote</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api-helper.js"></script>
+    <style>
+        .registration-choice-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+        }
+
+        .registration-choice-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 3rem;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .choice-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .choice-header h1 {
+            color: #2563eb;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .choice-header p {
+            color: var(--gray-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .choice-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .choice-card {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .choice-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.2);
+        }
+
+        .choice-icon {
+            font-size: 4rem;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            background: #f0f4ff;
+            border-radius: 50%;
+        }
+
+        .choice-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .choice-description {
+            color: var(--gray-color);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .choice-features {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .choice-features li {
+            padding: 0.5rem 0;
+            color: var(--gray-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .choice-features i {
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        .choice-cta {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .choice-cta:hover {
+            background: #1d4ed8;
+            transform: scale(1.02);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--gray-color);
+            font-size: 1rem;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+        }
+
+        .already-account {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray-color);
+        }
+
+        .already-account a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .already-account a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .registration-choice-content {
+                padding: 2rem;
+            }
+
+            .choice-header h1 {
+                font-size: 2rem;
+            }
+
+            .choice-options {
+                grid-template-columns: 1fr;
+            }
+
+            .choice-card {
+                padding: 2rem;
+            }
+
+            .choice-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-choice-container">
+        <div class="registration-choice-content">
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+
+            <div class="choice-header">
+                <h1>Choose Your Role</h1>
+                <p>Select whether you want to register as a voter or a candidate</p>
+            </div>
+
+            <div class="choice-options">
+                <!-- Voter Registration -->
+                <a href="register.html" class="choice-card">
+                    <div class="choice-icon">
+                        <i class="fas fa-vote-yea"></i>
+                    </div>
+                    <h2 class="choice-title">Register as Voter</h2>
+                    <p class="choice-description">
+                        Participate in elections and cast your secure vote
+                    </p>
+                    <ul class="choice-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Simple registration process</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Secure anonymous voting</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>View election results</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Track your vote history</span>
+                        </li>
+                    </ul>
+                    <button type="button" class="choice-cta">
+                        Register as Voter <i class="fas fa-arrow-right"></i>
+                    </button>
+                </a>
+
+                <!-- Candidate Registration -->
+                <a href="candidate-register.html" class="choice-card">
+                    <div class="choice-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h2 class="choice-title">Register as Candidate</h2>
+                    <p class="choice-description">
+                        Run for office and present your campaign platform
+                    </p>
+                    <ul class="choice-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>BSc degree required</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Party membership required</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Good conduct verification</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Campaign dashboard</span>
+                        </li>
+                    </ul>
+                    <button type="button" class="choice-cta">
+                        Register as Candidate <i class="fas fa-arrow-right"></i>
+                    </button>
+                </a>
+            </div>
+
+            <div class="divider">
+                <span>Already have an account?</span>
+            </div>
+
+            <div class="already-account">
+                <a href="login.html">Login to your account</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is already logged in
+            const voterId = sessionStorage.getItem('voter_id');
+            const candidateId = sessionStorage.getItem('candidate_id');
+
+            if (voterId) {
+                window.location.href = 'vote.html';
+            } else if (candidateId) {
+                window.location.href = 'candidate-dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

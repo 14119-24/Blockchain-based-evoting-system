@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockVote Setup</title>
+    <script src="js/api-helper.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%);
+            color: #0f172a;
+            display: flex;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
+            max-width: 640px;
+            padding: 40px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            color: #1e3a8a;
+            margin-bottom: 24px;
+            padding: 16px;
+        }
+
+        .message {
+            border-radius: 12px;
+            display: none;
+            margin-bottom: 18px;
+            padding: 14px 16px;
+        }
+
+        .message.success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+            display: block;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            display: block;
+        }
+
+        .message.warning {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            display: block;
+        }
+
+        .status-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .status-item {
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 14px 16px;
+        }
+
+        .status-item.pending {
+            color: #92400e;
+        }
+
+        .status-item.success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .status-item.error {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .status-icon {
+            font-size: 1.15rem;
+            width: 22px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .button {
+            background: #2563eb;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 14px 16px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background: #334155;
+        }
+
+        .button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .help-text {
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+
+        code {
+            background: #e2e8f0;
+            border-radius: 6px;
+            padding: 2px 6px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 28px 20px;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BlockVote Setup</h1>
+        <p class="subtitle">
+            Initialize the database and create the default administrator account for this deployment.
+        </p>
+
+        <div class="info-box">
+            <strong>Default admin credentials</strong><br>
+            Email: <code>admin@votingsystem.local</code><br>
+            Password: <code>Admin123!</code>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <ul class="status-list">
+            <li class="status-item pending" data-status="database_connected">
+                <span class="status-icon">...</span>
+                <span>Database connection</span>
+            </li>
+            <li class="status-item pending" data-status="tables_created">
+                <span class="status-icon">...</span>
+                <span>Creating tables</span>
+            </li>
+            <li class="status-item pending" data-status="admin_created">
+                <span class="status-icon">...</span>
+                <span>Admin user setup</span>
+            </li>
+        </ul>
+
+        <div class="button-row">
+            <button class="button" id="setupBtn" type="button" onclick="runSetup()">Start Database Setup</button>
+            <button class="button secondary" type="button" onclick="goHome()">Go to Home</button>
+        </div>
+
+        <p class="help-text">
+            Access this page through Apache, for example
+            <code>http://localhost/voting_system/public/setup.html</code>.
+            Do not open it with <code>file://</code>.
+        </p>
+    </div>
+
+    <script>
+        const STATUS_ICONS = {
+            pending: '...',
+            success: 'OK',
+            error: 'X'
+        };
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+        }
+
+        function setStatus(key, state) {
+            const item = document.querySelector(`[data-status="${key}"]`);
+            if (!item) {
+                return;
+            }
+
+            item.className = `status-item ${state}`;
+            item.querySelector('.status-icon').textContent = STATUS_ICONS[state];
+        }
+
+        function updateStatus(status) {
+            ['database_connected', 'tables_created', 'admin_created'].forEach((key) => {
+                if (typeof status[key] === 'boolean') {
+                    setStatus(key, status[key] ? 'success' : 'error');
+                }
+            });
+        }
+
+        async function runSetup() {
+            if (window.location.protocol === 'file:') {
+                showMessage('warning', 'Open this page through Apache/XAMPP using http://localhost/voting_system/public/setup.html.');
+                return;
+            }
+
+            const btn = document.getElementById('setupBtn');
+            btn.disabled = true;
+            btn.textContent = 'Setting up...';
+
+            showMessage('warning', 'Working on database setup...');
+
+            try {
+                const response = await fetch('../setup-api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'setup_database' })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    updateStatus(result.status || {});
+                    showMessage('error', result.error || 'Setup failed. Please review the database configuration.');
+                    btn.disabled = false;
+                    btn.textContent = 'Retry Setup';
+                    return;
+                }
+
+                updateStatus(result.status || {});
+                showMessage('success', result.message || 'Database setup completed successfully. Redirecting to the home page...');
+                btn.textContent = 'Setup Complete';
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1800);
+            } catch (error) {
+                showMessage('error', `Network error: ${error.message}`);
+                btn.disabled = false;
+                btn.textContent = 'Retry Setup';
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

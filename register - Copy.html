@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Blockchain Voting System</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/voter-auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api-helper.js"></script>
+</head>
+<body class="auth-page voter-register-page">
+    <main class="auth-layout register-layout">
+        <section class="auth-showcase">
+            <div class="showcase-panel">
+                <span class="showcase-kicker">Voter Registration</span>
+                <h1>Register once, verify clearly, and move into the ballot with confidence.</h1>
+                <p>The registration experience now feels more guided, more modern, and easier to complete without confusion.</p>
+                <div class="showcase-points">
+                    <span><i class="fas fa-user-plus"></i> Guided onboarding</span>
+                    <span><i class="fas fa-id-card"></i> Identity-first verification</span>
+                    <span><i class="fas fa-lock"></i> Strong account protection</span>
+                </div>
+            </div>
+            <div class="showcase-grid">
+                <article class="showcase-card">
+                    <span class="showcase-card-label">Step 1</span>
+                    <strong>Enter your personal details</strong>
+                    <p>Basic voter information is captured in a simpler, easier-to-scan first step.</p>
+                </article>
+                <article class="showcase-card">
+                    <span class="showcase-card-label">Step 2</span>
+                    <strong>Confirm your identity details</strong>
+                    <p>Your identity information is collected for verification before voting access is granted.</p>
+                </article>
+                <article class="showcase-card accent">
+                    <span class="showcase-card-label">Step 3</span>
+                    <strong>Create a secure account</strong>
+                    <p>Strong password guidance and clearer form states help complete registration smoothly.</p>
+                </article>
+            </div>
+        </section>
+
+        <div class="auth-container auth-container-wide">
+        <div class="auth-header">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            <div class="auth-brand">
+                <i class="fas fa-vote-yea"></i>
+                <span>BlockVote</span>
+            </div>
+            <h1 class="auth-title">Voter Registration</h1>
+            <p class="auth-subtitle">Create your voter account and begin the verification process</p>
+        </div>
+
+        <div class="registration-progress">
+            <div class="progress-step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Personal Info</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">2</div>
+                <div class="step-label">Identity</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-number">3</div>
+                <div class="step-label">Verification</div>
+            </div>
+        </div>
+
+        <form id="registrationForm" onsubmit="registerVoter(event)">
+            <div class="form-section active" id="section-personal">
+                <h3><i class="fas fa-user"></i> Personal Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="full-name">
+                            <i class="fas fa-user-circle"></i> Full Name *
+                        </label>
+                        <input type="text" id="full-name" name="full_name" required 
+                               placeholder="Enter your full name" minlength="3">
+                        <div class="error-message" id="full-name-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email Address *
+                        </label>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="Enter your email address">
+                        <div class="error-message" id="email-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </label>
+                        <input type="tel" id="phone" name="phone" 
+                               placeholder="Enter your phone number">
+                        <div class="error-message" id="phone-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob">
+                            <i class="fas fa-birthday-cake"></i> Date of Birth
+                        </label>
+                        <input type="date" id="dob" name="dob" 
+                               max="2006-12-31">
+                        <div class="error-message" id="dob-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="nextSection()">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-section" id="section-identity">
+                <h3><i class="fas fa-id-card"></i> Identity Information</h3>
+                
+                <div class="form-group">
+                    <label for="national-id">
+                        <i class="fas fa-fingerprint"></i> National ID Number *
+                    </label>
+                    <input type="text" id="national-id" name="national_id" required 
+                           placeholder="Enter your national ID number" 
+                           pattern="[A-Za-z0-9]{5,20}">
+                    <small class="form-help">Used for verification only. Will be securely hashed.</small>
+                    <div class="error-message" id="national-id-error"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="address">
+                            <i class="fas fa-home"></i> Address
+                        </label>
+                        <input type="text" id="address" name="address" 
+                               placeholder="Enter your address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">
+                            <i class="fas fa-city"></i> City
+                        </label>
+                        <input type="text" id="city" name="city" 
+                               placeholder="Enter your city">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="state">
+                            <i class="fas fa-map-marker-alt"></i> State/Province
+                        </label>
+                        <input type="text" id="state" name="state" 
+                               placeholder="Enter your state/province">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="zip">
+                            <i class="fas fa-mail-bulk"></i> ZIP/Postal Code
+                        </label>
+                        <input type="text" id="zip" name="zip" 
+                               placeholder="Enter ZIP/postal code">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-section" id="section-security">
+                <h3><i class="fas fa-shield-alt"></i> Account Security</h3>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password *
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Create a strong password" minlength="8">
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar"></div>
+                        <div class="strength-label">Password strength: <span id="strength-text">None</span></div>
+                    </div>
+                    <div class="error-message" id="password-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">
+                        <i class="fas fa-lock"></i> Confirm Password *
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="confirm-password" name="confirm_password" required 
+                               placeholder="Confirm your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="confirm-password-error"></div>
+                </div>
+
+                <div class="terms-agreement">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <span>I agree to the <a href="#" onclick="showTerms()">Terms and Conditions</a> and 
+                              <a href="#" onclick="showPrivacy()">Privacy Policy</a> *</span>
+                    </label>
+                    <div class="error-message" id="terms-error"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Complete Registration
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="registration-info">
+            <h4><i class="fas fa-info-circle"></i> Registration Information</h4>
+            <ul>
+                <li><i class="fas fa-shield-alt"></i> Your personal data is securely encrypted</li>
+                <li><i class="fas fa-hash"></i> National ID is hashed for privacy protection</li>
+                <li><i class="fas fa-key"></i> Cryptographic keys will be generated for you</li>
+                <li><i class="fas fa-clock"></i> Admin verification required before voting</li>
+                <li><i class="fas fa-envelope"></i> You will receive your voter ID via email</li>
+            </ul>
+        </div>
+
+        <div class="auth-links">
+            <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+
+        <!-- Registration Status -->
+        <div class="registration-status" id="registration-status">
+            <!-- Messages will appear here -->
+        </div>
+        </div>
+    </main>
+
+    <!-- Terms Modal -->
+    <div class="modal" id="terms-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Terms and Conditions</h3>
+                <button class="btn-close" onclick="hideModal('terms-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>Blockchain Voting System - Terms of Use</h4>
+                <p><strong>1. Eligibility:</strong> You must be eligible to vote according to election rules.</p>
+                <p><strong>2. One Vote Only:</strong> Each voter can cast only one vote per election.</p>
+                <p><strong>3. Identity Verification:</strong> You agree to provide accurate identification.</p>
+                <p><strong>4. Vote Secrecy:</strong> Your vote choice remains confidential.</p>
+                <p><strong>5. System Integrity:</strong> Do not attempt to manipulate the voting system.</p>
+                <p><strong>6. Account Security:</strong> You are responsible for keeping your credentials secure.</p>
+                <p><strong>7. Data Privacy:</strong> Your data is protected according to our privacy policy.</p>
+                <p><strong>8. Election Rules:</strong> You agree to follow all election regulations.</p>
+                <p><em>By registering, you acknowledge and accept these terms.</em></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="hideModal('terms-modal')">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal" id="privacy-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Privacy Policy</h3>
+                <button class="btn-close" onclick="hideModal('privacy-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>Data Protection and Privacy</h4>
+                <p><strong>1. Data Collection:</strong> We collect only necessary information for voting.</p>
+                <p><strong>2. Data Encryption:</strong> All personal data is encrypted using industry standards.</p>
+                <p><strong>3. Identity Protection:</strong> Your national ID is hashed and never stored in plain text.</p>
+                <p><strong>4. Vote Anonymity:</strong> Your vote is separated from your identity using cryptographic hashing.</p>
+                <p><strong>5. Blockchain Storage:</strong> Only encrypted votes are stored on the blockchain.</p>
+                <p><strong>6. Data Retention:</strong> Personal data is retained only as required by election laws.</p>
+                <p><strong>7. Security Measures:</strong> We implement multiple security layers to protect your data.</p>
+                <p><strong>8. Your Rights:</strong> You have the right to access and correct your personal information.</p>
+                <p><em>Your privacy is our priority in maintaining election integrity.</em></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="hideModal('privacy-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 1;
+        const totalSections = 3;
+
+        // Helper function to get the correct API URL
+        function getApiUrl(endpoint) {
+            // Always go up from /public to root, then /api
+            // Current location: /voting_system/public/register.html
+            // Needed: /voting_system/api/auth.php
+            return '../api/' + endpoint;
+        }
+
+        function showSection(sectionNumber) {
+            // Hide all sections
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`section-${getSectionName(sectionNumber)}`).classList.add('active');
+            
+            // Update progress steps
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                step.classList.remove('active');
+                step.classList.remove('completed');
+                
+                if (index + 1 < sectionNumber) {
+                    step.classList.add('completed');
+                } else if (index + 1 === sectionNumber) {
+                    step.classList.add('active');
+                }
+            });
+            
+            currentSection = sectionNumber;
+        }
+
+        function getSectionName(sectionNumber) {
+            switch(sectionNumber) {
+                case 1: return 'personal';
+                case 2: return 'identity';
+                case 3: return 'security';
+                default: return 'personal';
+            }
+        }
+
+        function nextSection() {
+            if (validateCurrentSection()) {
+                if (currentSection < totalSections) {
+                    showSection(currentSection + 1);
+                }
+            }
+        }
+
+        function prevSection() {
+            if (currentSection > 1) {
+                showSection(currentSection - 1);
+            }
+        }
+
+        function validateCurrentSection() {
+            const section = document.getElementById(`section-${getSectionName(currentSection)}`);
+            const inputs = section.querySelectorAll('input[required]');
+            let isValid = true;
+
+            // Clear previous errors
+            section.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+
+            for (const input of inputs) {
+                if (!input.value.trim()) {
+                    const errorId = `${input.id}-error`;
+                    const errorEl = document.getElementById(errorId);
+                    if (errorEl) {
+                        errorEl.textContent = 'This field is required';
+                    }
+                    isValid = false;
+                }
+
+                // Additional validation for email
+                if (input.type === 'email' && input.value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input.value)) {
+                        document.getElementById('email-error').textContent = 'Please enter a valid email';
+                        isValid = false;
+                    }
+                }
+
+                // Additional validation for password in section 3
+                if (currentSection === 3 && input.id === 'password' && input.value) {
+                    if (input.value.length < 8) {
+                        document.getElementById('password-error').textContent = 'Password must be at least 8 characters';
+                        isValid = false;
+                    }
+                }
+            }
+
+            return isValid;
+        }
+
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const toggleBtn = input.nextElementSibling.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.classList.remove('fa-eye');
+                toggleBtn.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                toggleBtn.classList.remove('fa-eye-slash');
+                toggleBtn.classList.add('fa-eye');
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('password')?.addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.querySelector('.strength-bar');
+            const strengthText = document.getElementById('strength-text');
+            
+            if (!password) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.backgroundColor = '#e5e7eb';
+                strengthText.textContent = 'None';
+                return;
+            }
+            
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) strength += 20;
+            if (password.length >= 12) strength += 10;
+            
+            // Character type checks
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 20;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+            
+            // Cap at 100
+            strength = Math.min(strength, 100);
+            
+            strengthBar.style.width = `${strength}%`;
+            
+            // Set color and text based on strength
+            if (strength < 40) {
+                strengthBar.style.backgroundColor = '#ef4444'; // Red
+                strengthText.textContent = 'Weak';
+            } else if (strength < 70) {
+                strengthBar.style.backgroundColor = '#f59e0b'; // Orange
+                strengthText.textContent = 'Fair';
+            } else if (strength < 90) {
+                strengthBar.style.backgroundColor = '#10b981'; // Green
+                strengthText.textContent = 'Good';
+            } else {
+                strengthBar.style.backgroundColor = '#3b82f6'; // Blue
+                strengthText.textContent = 'Strong';
+            }
+        });
+
+        // Confirm password validation
+        document.getElementById('confirm-password')?.addEventListener('input', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = e.target.value;
+            const errorEl = document.getElementById('confirm-password-error');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match';
+            } else {
+                errorEl.textContent = '';
+            }
+        });
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function showTerms() {
+            showModal('terms-modal');
+            return false;
+        }
+
+        function showPrivacy() {
+            showModal('privacy-modal');
+            return false;
+        }
+
+        async function registerVoter(event) {
+            event.preventDefault();
+            
+            if (!validateCurrentSection()) {
+                showMessage('error', 'Please fill in all required fields correctly');
+                return;
+            }
+
+            // Check if passwords match
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                showSection(3);
+                document.getElementById('confirm-password-error').textContent = 'Passwords do not match';
+                showMessage('error', 'Passwords do not match');
+                return;
+            }
+
+            // Check terms agreement
+            if (!document.getElementById('terms').checked) {
+                showSection(3);
+                document.getElementById('terms-error').textContent = 'You must agree to the terms and conditions';
+                showMessage('error', 'Please agree to the terms and conditions');
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                full_name: document.getElementById('full-name').value,
+                email: document.getElementById('email').value,
+                national_id: document.getElementById('national-id').value,
+                password: password,
+                confirm_password: confirmPassword,
+                phone: document.getElementById('phone').value || '',
+                dob: document.getElementById('dob').value || '',
+                address: document.getElementById('address').value || '',
+                city: document.getElementById('city').value || '',
+                state: document.getElementById('state').value || '',
+                zip: document.getElementById('zip').value || ''
+            };
+
+            try {
+                const apiUrl = getApiUrl('auth.php?action=register');
+                console.log('Registering voter with URL:', apiUrl);
+                console.log('Form data:', formData);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Get response as text first to debug
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                // Try to parse as JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.error('Response was:', responseText.substring(0, 500));
+                    showMessage('error', 'Server returned invalid response. Check browser console for details.');
+                    return;
+                }
+                
+                console.log('Parsed response data:', data);
+
+                if (data.success) {
+                    showMessage('success', 'Registration successful! Your account is pending verification.');
+                    
+                    // Store voter ID from the nested data object
+                    const voterId = data.data.voter_id;
+                    localStorage.setItem('pending_voter_id', voterId);
+                    
+                    // Show success details
+                    setTimeout(() => {
+                        const statusDiv = document.getElementById('registration-status');
+                        statusDiv.innerHTML = `
+                            <div class="success-message">
+                                <h4><i class="fas fa-check-circle"></i> Registration Complete!</h4>
+                                <p>Your Voter ID: <strong>${voterId}</strong></p>
+                                <p>Please save this ID for future reference.</p>
+                                <p>You will receive an email once your account is verified by an administrator.</p>
+                                <div class="success-actions">
+                                    <a href="login.html" class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                                    </a>
+                                    <button onclick="copyVoterId('${voterId}')" class="btn btn-secondary">
+                                        <i class="fas fa-copy"></i> Copy Voter ID
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }, 1000);
+                    
+                } else {
+                    let errorMessage = data.error || 'Registration failed';
+                    
+                    // Handle specific errors
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0];
+                        errorMessage = firstError;
+                        
+                        // Show errors in form
+                        Object.entries(data.errors).forEach(([field, message]) => {
+                            const errorId = `${field.replace('_', '-')}-error`;
+                            const errorEl = document.getElementById(errorId);
+                            if (errorEl) {
+                                errorEl.textContent = message;
+                            }
+                        });
+                    }
+                    
+                    console.error('Registration error:', errorMessage);
+                    showMessage('error', errorMessage);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('error', 'Network error. Please try again. Details: ' + error.message);
+            }
+        }
+
+        function showMessage(type, message) {
+            const statusDiv = document.getElementById('registration-status');
+            statusDiv.innerHTML = `
+                <div class="message ${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            statusDiv.style.display = 'block';
+        }
+
+        function copyVoterId(voterId) {
+            navigator.clipboard.writeText(voterId)
+                .then(() => {
+                    const statusDiv = document.getElementById('registration-status');
+                    const existingMessage = statusDiv.querySelector('.success-message');
+                    if (existingMessage) {
+                        const actionsDiv = existingMessage.querySelector('.success-actions');
+                        if (actionsDiv) {
+                            const copyBtn = actionsDiv.querySelector('button');
+                            if (copyBtn) {
+                                const originalHTML = copyBtn.innerHTML;
+                                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                                copyBtn.disabled = true;
+                                
+                                setTimeout(() => {
+                                    copyBtn.innerHTML = originalHTML;
+                                    copyBtn.disabled = false;
+                                }, 2000);
+                            }
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Copy failed:', err);
+                });
+        }
+
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection(1);
+            
+            // Set maximum date for date of birth (18 years ago)
+            const today = new Date();
+            const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+            document.getElementById('dob').max = maxDate.toISOString().split('T')[0];
+            
+            // Check if already logged in
+            fetch(getApiUrl('auth.php?action=check_session'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.data.user_type === 'voter') {
+                        window.location.href = 'vote.html';
+                    } else if (data.data.user_type === 'admin') {
+                        window.location.href = 'admin.html';
+                    }
+                }
+            })
+            .catch(error => console.error('Session check error:', error));
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            // Check if the clicked element is a modal overlay
+            const modal = e.target.closest('.modal');
+            if (modal && e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
+    <style>
+        .registration-progress {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 0 2rem;
+        }
+
+        .progress-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 0;
+        }
+
+        .progress-step:first-child::before {
+            left: 50%;
+        }
+
+        .progress-step:last-child::before {
+            right: 50%;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: var(--border-color);
+            color: var(--gray-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            color: var(--gray-color);
+        }
+
+        .progress-step.active .step-number {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-step.completed .step-number {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .progress-step.completed::before {
+            background-color: var(--secondary-color);
+        }
+
+        .form-section {
+            display: none;
+            padding: 0 2rem;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-section h3 {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-help {
+            font-size: 0.75rem;
+            color: var(--gray-color);
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            margin-bottom: 0.25rem;
+            transition: all 0.3s;
+        }
+
+        .strength-label {
+            font-size: 0.75rem;
+            color: var(--gray-color);
+        }
+
+        .terms-agreement {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: var(--light-color);
+            border-radius: 0.5rem;
+        }
+
+        .terms-agreement a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .terms-agreement a:hover {
+            text-decoration: underline;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .registration-info {
+            margin: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-color);
+            border-radius: 0.5rem;
+        }
+
+        .registration-info h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .registration-info ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .registration-info li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .registration-info li i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .registration-status {
+            padding: 0 2rem 2rem;
+        }
+
+        .success-message {
+            background-color: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-message h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</body>
+</html>

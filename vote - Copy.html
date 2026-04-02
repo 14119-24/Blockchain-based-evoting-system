@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cast Your Vote - Blockchain Voting System</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/api-helper.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-vote-yea"></i>
+                <span>BlockVote</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#election-info" class="nav-link">Election Info</a>
+                <a href="#how-to-vote" class="nav-link">How to Vote</a>
+                <div class="user-menu">
+                    <span id="voter-name">Loading...</span>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="voting-container">
+        <!-- Voting Status Banner -->
+        <div class="voting-status-banner" id="voting-status">
+            <div class="status-content">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Loading voting session...</span>
+            </div>
+        </div>
+
+        <div class="voting-instructions" id="ongoing-elections-panel" style="display: none;">
+            <h3><i class="fas fa-list"></i> Ongoing Elections</h3>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="ongoing-election-select">Choose an active election</label>
+                <select id="ongoing-election-select" onchange="switchElection(this.value)">
+                    <option value="">Select an election</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Election Header -->
+        <div class="voting-header" id="election-header">
+            <div class="election-title">
+                <h1 id="election-name">Loading Election...</h1>
+                <div class="election-meta">
+                    <span class="election-id" id="election-id">Election #</span>
+                    <span class="election-status" id="election-status">Status: Loading</span>
+                </div>
+            </div>
+            <div class="election-timer" id="election-timer">
+                <i class="fas fa-clock"></i>
+                <span>Time remaining: Loading...</span>
+            </div>
+        </div>
+
+        <!-- Voting Progress -->
+        <div class="voting-progress">
+            <div class="progress-bar">
+                <div class="progress" id="voting-progress-bar"></div>
+            </div>
+            <div class="progress-label" id="voting-progress-label">
+                <span id="progress-start">Start Date</span>
+                <span id="progress-current">Current</span>
+                <span id="progress-end">End Date</span>
+            </div>
+        </div>
+
+        <!-- Main Voting Area -->
+        <div class="voting-main">
+            <div class="voting-instructions">
+                <h3><i class="fas fa-info-circle"></i> How to Vote</h3>
+                <ol class="instructions-list">
+                    <li>Review each candidate's information below</li>
+                    <li>Select your preferred candidate by clicking on their card</li>
+                    <li>Confirm your selection in the review section</li>
+                    <li>Digitally sign and submit your vote</li>
+                    <li>Receive your blockchain transaction receipt</li>
+                </ol>
+            </div>
+
+            <!-- Candidates Section -->
+            <div class="candidates-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Candidates</h2>
+                    <div class="candidate-count" id="candidate-count">0 candidates</div>
+                </div>
+                
+                <div class="candidates-grid" id="candidates-container">
+                    <!-- Candidates will be loaded here -->
+                    <div class="loading-candidates">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading candidates...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vote Confirmation -->
+            <div class="vote-confirmation" id="vote-confirmation" style="display: none;">
+                <div class="confirmation-header">
+                    <h3><i class="fas fa-check-circle"></i> Confirm Your Vote</h3>
+                    <p>Please review your selection before submitting</p>
+                </div>
+                
+                <div class="selected-candidate" id="selected-candidate-info">
+                    <!-- Selected candidate info will appear here -->
+                </div>
+                
+                <div class="confirmation-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Important:</strong> Once submitted, your vote cannot be changed or withdrawn.</p>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <button class="btn btn-secondary" onclick="cancelSelection()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn btn-primary" onclick="submitVote()" id="submit-vote-btn">
+                        <i class="fas fa-vote-yea"></i> Submit Vote
+                    </button>
+                </div>
+            </div>
+
+            <!-- Voting Complete -->
+            <div class="voting-complete" id="voting-complete" style="display: none;">
+                <div class="complete-header">
+                    <div class="complete-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>Vote Successfully Cast!</h2>
+                    <p>Your vote has been securely recorded on the blockchain</p>
+                </div>
+                
+                <div class="receipt-details" id="receipt-details">
+                    <!-- Receipt details will appear here -->
+                </div>
+                
+                <!-- Election Results (shown after voting) -->
+                <div class="election-results" id="election-results" style="display: none;">
+                    <div class="results-header">
+                        <h3><i class="fas fa-chart-bar"></i> Election Results</h3>
+                        <p>Current results for this election (updated in real-time)</p>
+                    </div>
+                    
+                    <div class="results-container" id="results-container">
+                        <div class="loading-results">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading results...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="complete-actions">
+                    <a href="index.html" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Return to Home
+                    </a>
+                    <button class="btn btn-secondary" onclick="verifyVote()" id="verify-vote-btn">
+                        <i class="fas fa-search"></i> Verify on Blockchain
+                    </button>
+                    <button class="btn btn-secondary" onclick="printReceipt()">
+                        <i class="fas fa-print"></i> Print Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="blockchain-info-sidebar">
+            <div class="sidebar-section">
+                <h4><i class="fas fa-user-shield"></i> Voter Information</h4>
+                <div class="voter-info">
+                    <div class="info-item">
+                        <span class="info-label">Voter ID:</span>
+                        <span class="info-value" id="display-voter-id">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Voting Status:</span>
+                        <span class="info-value" id="voter-status">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Session:</span>
+                        <span class="info-value" id="session-time">Active</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4><i class="fas fa-shield-alt"></i> Security Features</h4>
+                <ul class="security-features-list">
+                    <li><i class="fas fa-check"></i> End-to-end encryption</li>
+                    <li><i class="fas fa-check"></i> Digital signature required</li>
+                    <li><i class="fas fa-check"></i> Vote stored on blockchain</li>
+                    <li><i class="fas fa-check"></i> Anonymous voter hash</li>
+                    <li><i class="fas fa-check"></i> Immutable transaction</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Verification Modal -->
+    <div class="modal" id="verification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-search"></i> Blockchain Verification</h3>
+                <button class="btn-close" onclick="hideModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="verification-content">
+                <!-- Verification results will appear here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Receipt Modal -->
+    <div class="modal" id="print-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-print"></i> Print Vote Receipt</h3>
+                <button class="btn-close" onclick="hidePrintModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="print-content">
+                <!-- Printable receipt will appear here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <button class="btn btn-secondary" onclick="hidePrintModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Need Help?</h3>
+                <p>If you experience any issues with voting, please contact election support.</p>
+                <p><i class="fas fa-phone"></i> Support: 0725830819</p>
+                <p><i class="fas fa-envelope"></i> Email: 810egh@gmail.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>Voting Rules</h3>
+                <ul>
+                    <li>One vote per voter per election</li>
+                    <li>Votes are final and cannot be changed</li>
+                    <li>Your vote remains anonymous</li>
+                    <li>Results will be announced after election ends</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 BlockVote - Secure Blockchain Voting System | Current Time: <span id="current-time"></span></p>
+        </div>
+    </footer>
+
+    <script>
+        let currentVoter = null;
+        let currentElection = null;
+        let selectedCandidate = null;
+        let voteReceipt = null;
+        let lastVoteTransaction = null;
+        let electionCandidates = [];
+        let ongoingElections = [];
+        let currentElectionVoteStatus = null;
+
+        // Helper function to get the correct API URL
+        function getApiUrl(endpoint) {
+            // From public directory, api is one level up then into api folder
+            // /voting_system/public/ -> ../api/ -> /voting_system/api/
+            return '../api/' + endpoint;
+        }
+
+        // Initialize voting page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            const authenticated = await checkAuth();
+            if (!authenticated) {
+                return;
+            }
+
+            // Load election data
+            await loadElectionData();
+            if (currentElection) {
+                await loadCandidates();
+                await loadVotingStatus();
+            }
+            
+            // Start timers
+            updateCurrentTime();
+            startSessionTimer();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(getApiUrl('auth.php?action=check_session'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data.user_type === 'voter') {
+                    currentVoter = data.data;
+                    
+                    // Update voter info display
+                    document.getElementById('voter-name').textContent = currentVoter.full_name || ('Voter #' + currentVoter.voter_id);
+                    document.getElementById('display-voter-id').textContent = currentVoter.voter_id;
+                    document.getElementById('voter-status').textContent =
+                        currentVoter.is_verified ? 'Checking election status...' : 'Awaiting verification';
+                    
+                    // Update voting status banner
+                    const statusBanner = document.getElementById('voting-status');
+                    if (!currentVoter.is_verified) {
+                        statusBanner.innerHTML = `
+                            <div class="status-content already-voted">
+                                <i class="fas fa-user-clock"></i>
+                                <span>Your voter account is waiting for admin verification</span>
+                            </div>
+                        `;
+                        statusBanner.style.backgroundColor = '#fef3c7';
+                        statusBanner.style.color = '#92400e';
+                    } else {
+                        statusBanner.innerHTML = `
+                            <div class="status-content ready">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Your voting session is active. Loading ongoing elections...</span>
+                            </div>
+                        `;
+                        statusBanner.style.backgroundColor = '#dbeafe';
+                        statusBanner.style.color = '#1e40af';
+                    }
+                    
+                    return true;
+                } else {
+                    // Not authenticated or not a voter
+                    window.location.href = 'login.html';
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                showError('Authentication error. Please login again.');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+                return false;
+            }
+        }
+
+        async function loadElectionData() {
+            try {
+                // Get election ID from URL or use the first ongoing election
+                const urlParams = new URLSearchParams(window.location.search);
+                const electionId = urlParams.get('election');
+                
+                const response = await fetch(getApiUrl('admin.php?action=get_public_elections'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'ongoing' }),
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data.elections.length > 0) {
+                    ongoingElections = data.data.elections;
+
+                    currentElection = ongoingElections.find(e => String(e.election_id) === String(electionId))
+                        || ongoingElections[0];
+
+                    if (currentElection) {
+                        populateElectionSelector();
+                        const nextUrl = new URL(window.location.href);
+                        nextUrl.searchParams.set('election', currentElection.election_id);
+                        window.history.replaceState({}, '', nextUrl);
+                        updateElectionDisplay(currentElection);
+                        updateVotingProgress(currentElection);
+                        updateElectionTimer(currentElection);
+                    }
+                } else {
+                    ongoingElections = [];
+                    renderNoOngoingElections();
+                }
+            } catch (error) {
+                console.error('Error loading election data:', error);
+                showError('Failed to load election information');
+            }
+        }
+
+        function populateElectionSelector() {
+            const panel = document.getElementById('ongoing-elections-panel');
+            const select = document.getElementById('ongoing-election-select');
+
+            if (!panel || !select) {
+                return;
+            }
+
+            if (!ongoingElections.length) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+            select.innerHTML = ongoingElections.map(election => `
+                <option value="${election.election_id}" ${currentElection && String(currentElection.election_id) === String(election.election_id) ? 'selected' : ''}>
+                    ${election.election_name}
+                </option>
+            `).join('');
+
+            if (currentElection) {
+                select.value = currentElection.election_id;
+            }
+        }
+
+        async function switchElection(electionId) {
+            const nextElection = ongoingElections.find(e => String(e.election_id) === String(electionId));
+            if (!nextElection) {
+                return;
+            }
+
+            currentElection = nextElection;
+            selectedCandidate = null;
+            voteReceipt = null;
+            lastVoteTransaction = null;
+            currentElectionVoteStatus = null;
+            document.getElementById('vote-confirmation').style.display = 'none';
+            document.getElementById('voting-complete').style.display = 'none';
+            document.getElementById('election-results').style.display = 'none';
+            document.getElementById('submit-vote-btn').disabled = false;
+            document.getElementById('submit-vote-btn').innerHTML = '<i class="fas fa-vote-yea"></i> Submit Vote';
+
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('election', currentElection.election_id);
+            window.history.replaceState({}, '', nextUrl);
+
+            updateElectionDisplay(currentElection);
+            updateVotingProgress(currentElection);
+            updateElectionTimer(currentElection);
+            await loadCandidates();
+            await loadVotingStatus();
+        }
+
+        function renderNoOngoingElections() {
+            currentElection = null;
+            currentElectionVoteStatus = null;
+            ongoingElections = [];
+            document.getElementById('ongoing-elections-panel').style.display = 'none';
+            document.getElementById('election-name').textContent = 'No Ongoing Elections';
+            document.getElementById('election-id').textContent = 'Election unavailable';
+            document.getElementById('election-status').textContent = 'Status: None active';
+            document.getElementById('candidate-count').textContent = '0 candidates';
+            document.getElementById('candidates-container').innerHTML = `
+                <div class="error-loading">
+                    <i class="fas fa-info-circle"></i>
+                    <p>There are no ongoing elections available for voting right now.</p>
+                </div>
+            `;
+            document.getElementById('voting-status').innerHTML = `
+                <div class="status-content already-voted">
+                    <i class="fas fa-info-circle"></i>
+                    <span>No ongoing elections are available right now</span>
+                </div>
+            `;
+            document.getElementById('voting-status').style.backgroundColor = '#f3f4f6';
+            document.getElementById('voting-status').style.color = '#374151';
+        }
+
+        function updateElectionDisplay(election) {
+            document.getElementById('election-name').textContent = election.election_name;
+            document.getElementById('election-id').textContent = `Election #${election.election_id}`;
+            document.getElementById('election-status').textContent = `Status: ${election.status}`;
+            
+            // Update status color
+            const statusElement = document.getElementById('election-status');
+            switch(election.status) {
+                case 'ongoing':
+                    statusElement.style.color = '#10b981'; // Green
+                    break;
+                case 'pending':
+                case 'upcoming':
+                    statusElement.style.color = '#f59e0b'; // Orange
+                    break;
+                case 'completed':
+                    statusElement.style.color = '#475569'; // Gray
+                    break;
+            }
+        }
+
+        function updateVotingProgress(election) {
+            const now = new Date();
+            const start = new Date(election.start_date);
+            const end = new Date(election.end_date);
+            const total = end - start;
+            const elapsed = now - start;
+            
+            let progress = 0;
+            if (elapsed > 0 && total > 0) {
+                progress = Math.min(Math.max((elapsed / total) * 100, 0), 100);
+            }
+            
+            document.getElementById('voting-progress-bar').style.width = `${progress}%`;
+            
+            // Update labels
+            document.getElementById('progress-start').textContent = 
+                formatDate(start, 'short');
+            document.getElementById('progress-end').textContent = 
+                formatDate(end, 'short');
+            document.getElementById('progress-current').textContent = 
+                `${progress.toFixed(1)}% complete`;
+        }
+
+        function updateElectionTimer(election) {
+            const now = new Date();
+            const end = new Date(election.end_date);
+            const remaining = end - now;
+            
+            if (remaining <= 0) {
+                document.getElementById('election-timer').innerHTML = `
+                    <i class="fas fa-clock"></i>
+                    <span>Election has ended</span>
+                `;
+                document.getElementById('election-timer').style.color = '#ef4444';
+                return;
+            }
+            
+            // Calculate days, hours, minutes
+            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let timeString = '';
+            if (days > 0) {
+                timeString = `${days}d ${hours}h ${minutes}m`;
+            } else if (hours > 0) {
+                timeString = `${hours}h ${minutes}m`;
+            } else {
+                timeString = `${minutes}m`;
+            }
+            
+            document.getElementById('election-timer').innerHTML = `
+                <i class="fas fa-clock"></i>
+                <span>Time remaining: ${timeString}</span>
+            `;
+            
+            // Update color based on urgency
+            if (days < 1) {
+                document.getElementById('election-timer').style.color = '#ef4444'; // Red
+            } else if (days < 3) {
+                document.getElementById('election-timer').style.color = '#f59e0b'; // Orange
+            } else {
+                document.getElementById('election-timer').style.color = '#10b981'; // Green
+            }
+            
+            // Update every minute
+            setTimeout(() => updateElectionTimer(election), 60000);
+        }
+
+        async function loadCandidates() {
+            try {
+                if (!currentElection) return;
+                
+                const container = document.getElementById('candidates-container');
+                const response = await fetch(getApiUrl('admin.php?action=get_public_election_candidates'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ election_id: currentElection.election_id }),
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                const candidates = data.success ? (data.data.candidates || []) : [];
+
+                electionCandidates = candidates;
+                currentElection.candidates = candidates;
+
+                if (!candidates.length) {
+                    document.getElementById('candidate-count').textContent =
+                        '0 candidates';
+                    container.innerHTML = `
+                        <div class="error-loading">
+                            <i class="fas fa-info-circle"></i>
+                            <p>No candidates have been assigned to this election yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                document.getElementById('candidate-count').textContent = 
+                    `${candidates.length} candidates`;
+                
+                container.innerHTML = candidates.map(candidate => `
+                    <div class="candidate-card" onclick="selectCandidate(${candidate.candidate_id})" 
+                         data-candidate-id="${candidate.candidate_id}">
+                        <div class="candidate-symbol">
+                            ${candidate.symbol || 'Vote'}
+                        </div>
+                        <div class="candidate-info">
+                            <h3>${candidate.candidate_name}</h3>
+                            <p class="candidate-party">${candidate.party || 'Independent'}</p>
+                            <p class="candidate-description">Approved candidate for ${currentElection.election_name}</p>
+                        </div>
+                        <div class="candidate-select">
+                            <button class="btn-select" onclick="event.stopPropagation(); selectCandidate(${candidate.candidate_id})">
+                                <i class="fas fa-check"></i> Select
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                document.getElementById('candidates-container').innerHTML = `
+                    <div class="error-loading">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Failed to load candidates</p>
+                    </div>
+                `;
+            }
+        }
+
+        function selectCandidate(candidateId) {
+            if (currentElectionVoteStatus && currentElectionVoteStatus.has_voted) {
+                showError('You have already voted in this election');
+                return;
+            }
+
+            if (currentElectionVoteStatus && !currentElectionVoteStatus.can_vote) {
+                showError('Voting is not available for this election');
+                return;
+            }
+            
+            // Remove selection from all candidates
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to chosen candidate
+            const selectedCard = document.querySelector(`[data-candidate-id="${candidateId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedCandidate = candidateId;
+                
+                // Show confirmation section
+                showConfirmation(candidateId);
+            }
+        }
+
+        function showConfirmation(candidateId) {
+            // Get candidate info
+            const candidateCard = document.querySelector(`[data-candidate-id="${candidateId}"]`);
+            const candidateName = candidateCard.querySelector('h3').textContent;
+            const candidateParty = candidateCard.querySelector('.candidate-party').textContent;
+            const candidateSymbol = candidateCard.querySelector('.candidate-symbol').textContent;
+            
+            // Update confirmation section
+            document.getElementById('selected-candidate-info').innerHTML = `
+                <div class="selected-candidate-display">
+                    <div class="selected-symbol">${candidateSymbol}</div>
+                    <div class="selected-details">
+                        <h4>${candidateName}</h4>
+                        <p>${candidateParty}</p>
+                    </div>
+                </div>
+                <div class="selected-time">
+                    <i class="fas fa-clock"></i>
+                    <span>Selected at: ${new Date().toLocaleTimeString()}</span>
+                </div>
+            `;
+            
+            // Show confirmation section
+            document.getElementById('vote-confirmation').style.display = 'block';
+            
+            // Scroll to confirmation
+            document.getElementById('vote-confirmation').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        function cancelSelection() {
+            selectedCandidate = null;
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('vote-confirmation').style.display = 'none';
+        }
+
+        async function submitVote() {
+            if (!selectedCandidate) {
+                showError('Please select a candidate first');
+                return;
+            }
+            
+            if (currentElectionVoteStatus && currentElectionVoteStatus.has_voted) {
+                showError('You have already voted in this election');
+                return;
+            }
+            
+            // Disable submit button
+            const submitBtn = document.getElementById('submit-vote-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                // In a real implementation, this would use proper cryptographic signing
+                // For demo, we'll create a simplified signature
+                const voteData = {
+                    voter_id: currentVoter.voter_id,
+                    election_id: currentElection.election_id,
+                    candidate_id: selectedCandidate,
+                    timestamp: Date.now()
+                };
+                
+                // Create a simple signature for demo
+                const signature = btoa(JSON.stringify(voteData) + '|SIGNED|' + Date.now());
+                
+                const response = await fetch(getApiUrl('vote.php?action=submit'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        election_id: currentElection.election_id,
+                        candidate_id: selectedCandidate,
+                        signature: signature
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Store receipt
+                    voteReceipt = data.data;
+                    lastVoteTransaction = data.data.transaction_id;
+                    localStorage.setItem(`vote_receipt_${currentElection.election_id}`, JSON.stringify(voteReceipt));
+                    
+                    // Update voter status
+                    currentVoter.has_voted = true;
+                    currentElectionVoteStatus = {
+                        ...(currentElectionVoteStatus || {}),
+                        has_voted: true,
+                        can_vote: false,
+                        vote_record: {
+                            transaction_id: data.data.transaction_id,
+                            block_hash: data.data.block_hash,
+                            timestamp: data.data.timestamp
+                        }
+                    };
+                    document.getElementById('voter-status').textContent = 'Voted in this election';
+                    
+                    // Show success section
+                    showVotingComplete(data.data);
+                    
+                } else {
+                    showError(data.error || 'Failed to submit vote');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-vote-yea"></i> Submit Vote';
+                }
+                
+            } catch (error) {
+                console.error('Vote submission error:', error);
+                showError('Network error. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-vote-yea"></i> Submit Vote';
+            }
+        }
+
+        async function loadVotingStatus() {
+            if (!currentElection) {
+                return;
+            }
+
+            try {
+                const response = await fetch(getApiUrl('vote.php?action=status'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ election_id: currentElection.election_id })
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    showError(data.error || 'Failed to load voting status');
+                    return;
+                }
+
+                currentElectionVoteStatus = data.data;
+
+                if (!data.data.is_verified) {
+                    document.getElementById('vote-confirmation').style.display = 'none';
+                    document.getElementById('voting-complete').style.display = 'none';
+                    document.getElementById('voter-status').textContent = 'Awaiting verification';
+                    document.getElementById('voting-status').innerHTML = `
+                        <div class="status-content already-voted">
+                            <i class="fas fa-user-clock"></i>
+                            <span>Your voter account is waiting for admin verification</span>
+                        </div>
+                    `;
+                    document.getElementById('voting-status').style.backgroundColor = '#fef3c7';
+                    document.getElementById('voting-status').style.color = '#92400e';
+                    return;
+                }
+
+                if (data.data.has_voted) {
+                    document.getElementById('voter-status').textContent = 'Already voted in this election';
+                    document.getElementById('voting-status').innerHTML = `
+                        <div class="status-content already-voted">
+                            <i class="fas fa-check-circle"></i>
+                            <span>You have already voted in this election</span>
+                        </div>
+                    `;
+                    document.getElementById('voting-status').style.backgroundColor = '#dcfce7';
+                    document.getElementById('voting-status').style.color = '#166534';
+                    lastVoteTransaction = data.data.vote_record?.transaction_id || lastVoteTransaction;
+                    voteReceipt = data.data.vote_record ? {
+                        transaction_id: data.data.vote_record.transaction_id,
+                        block_hash: data.data.vote_record.block_hash || 'Unavailable',
+                        timestamp: data.data.vote_record.timestamp,
+                        election_id: currentElection.election_id
+                    } : JSON.parse(localStorage.getItem(`vote_receipt_${currentElection.election_id}`) || 'null');
+
+                    if (voteReceipt) {
+                        showVotingComplete(voteReceipt, { scroll: false });
+                    }
+                    return;
+                }
+
+                if (!data.data.election_open) {
+                    document.getElementById('vote-confirmation').style.display = 'none';
+                    document.getElementById('voting-complete').style.display = 'none';
+                    document.getElementById('voter-status').textContent = 'Election not open';
+                    document.getElementById('voting-status').innerHTML = `
+                        <div class="status-content already-voted">
+                            <i class="fas fa-clock"></i>
+                            <span>This election is not currently open for voting</span>
+                        </div>
+                    `;
+                    document.getElementById('voting-status').style.backgroundColor = '#fef3c7';
+                    document.getElementById('voting-status').style.color = '#92400e';
+                    return;
+                }
+
+                document.getElementById('voter-status').textContent = 'Eligible to vote';
+                document.getElementById('voting-complete').style.display = 'none';
+                document.getElementById('voting-status').innerHTML = `
+                    <div class="status-content ready">
+                        <i class="fas fa-check-circle"></i>
+                        <span>You can vote in this ongoing election</span>
+                    </div>
+                `;
+                document.getElementById('voting-status').style.backgroundColor = '#dbeafe';
+                document.getElementById('voting-status').style.color = '#1e40af';
+            } catch (error) {
+                console.error('Error loading voting status:', error);
+                showError('Failed to load election voting status');
+            }
+        }
+
+        function showVotingComplete(receipt, options = {}) {
+            const shouldScroll = options.scroll !== false;
+
+            // Hide confirmation and show complete section
+            document.getElementById('vote-confirmation').style.display = 'none';
+            document.getElementById('voting-complete').style.display = 'block';
+            
+            // Update receipt details
+            document.getElementById('receipt-details').innerHTML = `
+                <div class="receipt-item">
+                    <span class="receipt-label">Transaction ID:</span>
+                    <code class="receipt-value">${receipt.transaction_id}</code>
+                    <button class="btn-copy" onclick="copyToClipboard('${receipt.transaction_id}')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="receipt-item">
+                    <span class="receipt-label">Block Hash:</span>
+                    <code class="receipt-value">${receipt.block_hash.substring(0, 32)}...</code>
+                    <button class="btn-copy" onclick="copyToClipboard('${receipt.block_hash}')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="receipt-item">
+                    <span class="receipt-label">Timestamp:</span>
+                    <span class="receipt-value">${receipt.timestamp}</span>
+                </div>
+                <div class="receipt-note">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Save this receipt for verification purposes. Your vote is now immutable on the blockchain.</p>
+                </div>
+            `;
+            
+            // Load and display election results
+            loadElectionResults(currentElection.election_id);
+            
+            // Update voting status banner
+            document.getElementById('voting-status').innerHTML = `
+                <div class="status-content voted">
+                    <i class="fas fa-check-circle"></i>
+                    <span>You have successfully voted</span>
+                </div>
+            `;
+            document.getElementById('voting-status').style.backgroundColor = '#dcfce7';
+            document.getElementById('voting-status').style.color = '#166534';
+            
+            // Scroll to complete section
+            if (shouldScroll) {
+                document.getElementById('voting-complete').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+        }
+
+        async function verifyVote() {
+            if (!lastVoteTransaction) {
+                showError('No vote transaction to verify');
+                return;
+            }
+            
+            try {
+                const response = await fetch(getApiUrl('vote.php?action=verify'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        transaction_id: lastVoteTransaction
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showVerificationModal(data.data);
+                } else {
+                    showError('Verification failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                showError('Network error during verification');
+            }
+        }
+
+        async function loadElectionResults(electionId) {
+            try {
+                const response = await fetch(getApiUrl('vote.php?action=results'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ election_id: electionId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayElectionResults(data.data);
+                    document.getElementById('election-results').style.display = 'block';
+                } else {
+                    console.error('Failed to load results:', data.error);
+                    // Don't show error to user, just hide results section
+                }
+            } catch (error) {
+                console.error('Error loading election results:', error);
+            }
+        }
+
+        function displayElectionResults(resultsData) {
+            const container = document.getElementById('results-container');
+            
+            if (!resultsData.results || Object.keys(resultsData.results).length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>No votes yet</h4>
+                        <p>Results will appear here as votes are cast.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get candidate names for display
+            const candidateNames = {};
+            electionCandidates.forEach(candidate => {
+                candidateNames[candidate.candidate_id] = candidate.candidate_name;
+            });
+            
+            // Calculate percentages
+            const totalVotes = resultsData.total_votes;
+            const resultsArray = Object.entries(resultsData.results).map(([candidateId, votes]) => ({
+                candidateId: parseInt(candidateId),
+                candidateName: candidateNames[candidateId] || `Candidate ${candidateId}`,
+                votes: votes,
+                percentage: totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0
+            })).sort((a, b) => b.votes - a.votes);
+            
+            container.innerHTML = `
+                <div class="results-summary">
+                    <div class="summary-stat">
+                        <span class="stat-number">${totalVotes}</span>
+                        <span class="stat-label">Total Votes</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="stat-number">${resultsArray.length}</span>
+                        <span class="stat-label">Candidates</span>
+                    </div>
+                    <div class="summary-stat">
+                        <i class="fas fa-shield-alt"></i>
+                        <span class="stat-label">Blockchain Verified</span>
+                    </div>
+                </div>
+                
+                <div class="results-chart">
+                    ${resultsArray.map((result, index) => `
+                        <div class="result-row ${index === 0 ? 'leader' : ''}">
+                            <div class="candidate-info">
+                                <div class="rank">${index + 1}</div>
+                                <div class="candidate-name">${result.candidateName}</div>
+                            </div>
+                            <div class="vote-bar">
+                                <div class="bar" style="width: ${result.percentage}%"></div>
+                                <div class="vote-count">${result.votes} votes (${result.percentage}%)</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="results-footer">
+                    <p><i class="fas fa-info-circle"></i> Results are updated in real-time from the blockchain</p>
+                </div>
+            `;
+        }
+
+        function showVerificationModal(verificationData) {
+            document.getElementById('verification-content').innerHTML = `
+                <div class="verification-result">
+                    <div class="verification-status success">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>Vote Verified Successfully</h4>
+                    </div>
+                    
+                    <div class="verification-details">
+                        <div class="detail-group">
+                            <h5>Transaction Details</h5>
+                            <div class="detail-item">
+                                <span>Transaction ID:</span>
+                                <code>${verificationData.transaction.transaction_id}</code>
+                            </div>
+                            <div class="detail-item">
+                                <span>Voter Hash:</span>
+                                <code>${verificationData.transaction.voter_id_hash.substring(0, 16)}...</code>
+                            </div>
+                            <div class="detail-item">
+                                <span>Timestamp:</span>
+                                <span>${new Date(verificationData.transaction.timestamp).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <h5>Block Details</h5>
+                            <div class="detail-item">
+                                <span>Block Hash:</span>
+                                <code>${verificationData.block.block_hash.substring(0, 16)}...</code>
+                            </div>
+                            <div class="detail-item">
+                                <span>Previous Hash:</span>
+                                <code>${(verificationData.block.previous_hash || 'N/A').toString().substring(0, 16)}${verificationData.block.previous_hash && verificationData.block.previous_hash.length > 16 ? '...' : ''}</code>
+                            </div>
+                            <div class="detail-item">
+                                <span>Block Timestamp:</span>
+                                <span>${new Date(verificationData.block.timestamp).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-note">
+                            <i class="fas fa-info-circle"></i>
+                            <p>This verification proves your vote exists in the blockchain without revealing your choice.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('verification-modal');
+        }
+
+        function printReceipt() {
+            if (!voteReceipt) {
+                showError('No vote receipt available');
+                return;
+            }
+            
+            document.getElementById('print-content').innerHTML = `
+                <div class="printable-receipt">
+                    <div class="receipt-header">
+                        <h2><i class="fas fa-vote-yea"></i> BlockVote Receipt</h2>
+                        <p>Blockchain Voting System</p>
+                    </div>
+                    
+                    <div class="receipt-body">
+                        <div class="receipt-section">
+                            <h4>Voter Information</h4>
+                            <p>Voter ID: ${currentVoter.voter_id}</p>
+                            <p>Election: ${currentElection.election_name}</p>
+                            <p>Date: ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        
+                        <div class="receipt-section">
+                            <h4>Transaction Details</h4>
+                            <p>Transaction ID: ${voteReceipt.transaction_id}</p>
+                            <p>Block Hash: ${voteReceipt.block_hash}</p>
+                            <p>Timestamp: ${voteReceipt.timestamp}</p>
+                        </div>
+                        
+                        <div class="receipt-section">
+                            <h4>Verification</h4>
+                            <p>This receipt confirms that a vote was successfully cast and recorded on the blockchain.</p>
+                            <p><strong>Note:</strong> This receipt does not reveal the vote choice, preserving voter anonymity.</p>
+                        </div>
+                        
+                        <div class="receipt-footer">
+                            <p>For verification, visit: ${window.location.origin}/verify.html</p>
+                            <p>Transaction ID: ${voteReceipt.transaction_id}</p>
+                            <div class="barcode">[BARCODE PLACEHOLDER]</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('print-modal').style.display = 'flex';
+        }
+
+        function hidePrintModal() {
+            document.getElementById('print-modal').style.display = 'none';
+        }
+
+        function startSessionTimer() {
+            let sessionMinutes = 29; // 30 minute session
+            let sessionSeconds = 59;
+            
+            const timer = setInterval(() => {
+                if (sessionSeconds === 0) {
+                    if (sessionMinutes === 0) {
+                        clearInterval(timer);
+                        showSessionExpired();
+                        return;
+                    }
+                    sessionMinutes--;
+                    sessionSeconds = 59;
+                } else {
+                    sessionSeconds--;
+                }
+                
+                document.getElementById('session-time').textContent = 
+                    `${sessionMinutes.toString().padStart(2, '0')}:${sessionSeconds.toString().padStart(2, '0')}`;
+                
+                // Change color when less than 5 minutes
+                if (sessionMinutes < 5) {
+                    document.getElementById('session-time').style.color = '#ef4444';
+                }
+            }, 1000);
+        }
+
+        function showSessionExpired() {
+            document.getElementById('session-time').textContent = 'Expired';
+            document.getElementById('session-time').style.color = '#ef4444';
+            
+            showError('Your session has expired. Please login again.');
+            setTimeout(() => {
+                logout();
+            }, 3000);
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.toLocaleTimeString('en-US', { hour12: true });
+            
+            setTimeout(updateCurrentTime, 1000);
+        }
+
+        function logout() {
+            fetch(getApiUrl('auth.php?action=logout'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(() => {
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                window.location.href = 'login.html';
+            });
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.body.style.overflow = '';
+        }
+
+        function showError(message) {
+            // Create error notification
+            const notification = document.createElement('div');
+            notification.className = 'error-notification';
+            notification.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: #fee2e2;
+                color: #991b1b;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                z-index: 2000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    // Show success message
+                    const button = event.target.closest('.btn-copy');
+                    if (button) {
+                        const originalHTML = button.innerHTML;
+                        button.innerHTML = '<i class="fas fa-check"></i>';
+                        button.style.color = '#10b981';
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalHTML;
+                            button.style.color = '';
+                        }, 2000);
+                    }
+                })
+                .catch(err => {
+                    console.error('Copy failed:', err);
+                });
+        }
+
+        function formatDate(date, format = 'short') {
+            if (format === 'short') {
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+            return date.toLocaleDateString();
+        }
+    </script>
+
+    <style>
+        .voting-container {
+            max-width: 1200px;
+            margin: 5rem auto 2rem;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .voting-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .voting-status-banner {
+            grid-column: 1 / -1;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .voting-status-banner.already-voted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .voting-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+
+        .election-title h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .election-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-color);
+        }
+
+        .election-timer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .voting-progress {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+        }
+
+        .voting-main {
+            grid-column: 1;
+        }
+
+        .voting-instructions {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .voting-instructions h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .instructions-list {
+            padding-left: 1.5rem;
+        }
+
+        .instructions-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .candidates-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+
+        .candidate-count {
+            background: var(--light-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--gray-color);
+        }
+
+        .candidates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .candidate-card {
+            background: var(--light-color);
+            border: 2px solid transparent;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .candidate-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .candidate-card.selected {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .candidate-symbol {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .candidate-info h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .candidate-party {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .candidate-description {
+            color: var(--gray-color);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .candidate-select {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .btn-select {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-select:hover {
+            background: var(--primary-dark);
+        }
+
+        .vote-confirmation, .voting-complete {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .confirmation-header h3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .selected-candidate-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .selected-symbol {
+            font-size: 2rem;
+        }
+
+        .selected-details h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .selected-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-color);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .confirmation-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .voting-complete {
+            text-align: center;
+        }
+
+        .complete-icon {
+            font-size: 3rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+        }
+
+        .receipt-details {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .receipt-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .receipt-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .receipt-label {
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .receipt-value {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .btn-copy {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .receipt-note {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+
+        .complete-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .blockchain-info-sidebar {
+            grid-column: 2;
+        }
+
+        @media (max-width: 1024px) {
+            .blockchain-info-sidebar {
+                grid-column: 1;
+                order: 3;
+            }
+        }
+
+        .sidebar-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .voter-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--gray-color);
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .security-features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .security-features-list li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .security-features-list li i {
+            color: #10b981;
+        }
+
+        .loading-candidates, .error-loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-color);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-logout:hover {
+            background: var(--light-color);
+        }
+
+        .error-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .error-notification button {
+            background: none;
+            border: none;
+            color: #991b1b;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .printable-receipt {
+            background: white;
+            padding: 2rem;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 1rem;
+        }
+
+        .receipt-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .receipt-section:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .barcode {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light-color);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .printable-receipt, .printable-receipt * {
+                visibility: visible;
+            }
+            .printable-receipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</body>
+</html>

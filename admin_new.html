@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard (New) - Blockchain Voting System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    body {margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f7fb; color:#0f172a;}
+    .admin-app {display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
+    .sidebar {background:#0f172a;color:#cbd5e1;display:flex;flex-direction:column;}
+    .sidebar h2 {margin:1rem; color:#fff;}
+    .nav-link {padding:.75rem 1rem; cursor:pointer; color:inherit; text-decoration:none; display:flex; align-items:center; gap:0.65rem;}
+    .nav-link.active, .nav-link:hover {background:#1e293b; color:#fff;}
+    .main {padding:1rem;}
+    .topbar {display:flex;justify-content:space-between;align-items:center; margin-bottom:1rem;}
+    .cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem; margin-bottom:1rem;}
+    .card {background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.04);padding:1rem; color:#0f172a;}
+    .card h3{margin:0 0 .5rem;font-size:1rem;}
+    .table-wrap {background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.04);padding:.5rem; overflow-x:auto; color:#0f172a;}
+    table {width:100%;border-collapse:collapse;}
+    th,td{padding:.65rem .6rem;text-align:left;border-bottom:1px solid #e2e8f0;}
+    th {background:#f1f5f9;}
+    .btn {border:none;border-radius:5px;padding:.4rem .7rem;cursor:pointer;font-size:.85rem;}
+    .btn-primary{background:#0ea5e9;color:#fff;}
+    .btn-success{background:#16a34a;color:#fff;}
+    .btn-warning{background:#f59e0b;color:#fff;}
+    .btn-danger{background:#dc2626;color:#fff;}
+    .btn-light{background:#e2e8f0;color:#0f172a;}
+    .hidden{display:none;}
+    .status-badge{border-radius:999px;padding:.15rem .6rem;font-size:.75rem;font-weight:600;}
+    .status-badge.ongoing{background:#bef264;color:#166534;}
+    .status-badge.upcoming{background:#fcd34d;color:#92400e;}
+    .status-badge.completed{background:#a7f3d0;color:#065f46;}
+    .status-badge.pending{background:#fde68a;color:#92400e;}
+    .status-badge.verified{background:#86efac;color:#166534;}
+    .status-badge.rejected{background:#fecaca;color:#991b1b;}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;justify-content:center;align-items:center;z-index:99;}
+    .modal {width:100%;max-width:480px;background:#fff;border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,.25); color:#0f172a;}
+    .modal-header{padding:1rem;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;}
+    .modal-body{padding:1rem;}
+    .modal-footer{padding:1rem;border-top:1px solid #e2e8f0;text-align:right;}
+    .notification-wrapper{position:fixed;right:1rem;top:1rem;z-index:200;display:grid;gap:.5rem;}
+    .notification{padding:.7rem 1rem;border-radius:6px;color:#fff;min-width:220px;display:flex;justify-content:space-between;align-items:center;gap:.5rem;box-shadow:0 8px 20px rgba(0,0,0,.2);}
+    .notification.success{background:#16a34a;}
+    .notification.error{background:#dc2626;}
+    .notification.info{background:#0ea5e9;}
+    .search-bar{margin-bottom:0.8rem;display:flex;gap:.5rem;align-items:center;}
+    .search-bar input{flex:1;padding:.5rem .7rem;border:1px solid #cbd5e1;border-radius:6px;color:#0f172a;background:#fff;}
+    .search-bar input::placeholder{color:#64748b;opacity:1;}
+  </style>
+</head>
+<body>
+  <div class="admin-app">
+    <aside class="sidebar">
+      <h2><i class="fas fa-vote-yea"></i> BlockVote</h2>
+      <nav>
+        <div class="nav-link active" data-section="dashboard" onclick="switchSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+        <div class="nav-link" data-section="elections" onclick="switchSection('elections')"><i class="fas fa-vote-yea"></i> Elections</div>
+        <div class="nav-link" data-section="candidates" onclick="switchSection('candidates')"><i class="fas fa-users"></i> Candidates</div>
+        <div class="nav-link" data-section="approvals" onclick="switchSection('approvals')"><i class="fas fa-user-check"></i> Candidate Approvals</div>
+        <div class="nav-link" data-section="voters" onclick="switchSection('voters')"><i class="fas fa-user-friends"></i> Voters</div>
+        <div class="nav-link" data-section="blocks" onclick="switchSection('blocks')"><i class="fas fa-link"></i> Blockchain</div>
+        <div class="nav-link" data-section="audit" onclick="switchSection('audit')"><i class="fas fa-clipboard-list"></i> Audit Logs</div>
+      </nav>
+      <div style="margin-top:auto;padding:1rem;border-top:1px solid #334155;">
+        <button class="btn btn-light" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div id="adminWelcome">Hello, Admin</div>
+      </div>
+
+      <section id="section-dashboard" class="section active">
+        <div class="cards">
+          <article class="card"><h3>Total Blocks</h3><div id="blocksCount">-</div></article>
+          <article class="card"><h3>Total Votes</h3><div id="votesCount">-</div></article>
+          <article class="card"><h3>Total Voters</h3><div id="votersCount">-</div></article>
+          <article class="card"><h3>Active Elections</h3><div id="activeElectionCount">-</div></article>
+        </div>
+        <div class="card" style="margin-bottom:1rem;"><h3>Recent Audit Activity</h3><div id="recentActivity">Loading...</div></div>
+      </section>
+
+      <section id="section-elections" class="section hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+          <h2>Elections</h2>
+          <button class="btn btn-primary" onclick="openElectionModal()"><i class="fas fa-plus"></i> Create Election</button>
+        </div>
+        <div class="search-bar"><input id="searchElections" type="text" placeholder="Search election" oninput="loadElections(this.value)" /></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Start</th><th>End</th><th>Candidates</th><th>Action</th></tr></thead><tbody id="electionsTable"><tr><td colspan="7">Loading...</td></tr></tbody></table></div>
+      </section>
+
+      <section id="section-candidates" class="section hidden">
+        <h2>Candidate Management</h2>
+        <div class="search-bar"><input id="searchCandidates" placeholder="Search candidate" oninput="loadCandidates(this.value)"/></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Party</th><th>Status</th><th>Payment</th><th>Action</th></tr></thead><tbody id="candidatesTable"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
+      </section>
+
+      <section id="section-approvals" class="section hidden">
+        <h2>Candidate Registrations</h2>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Party</th><th>Verification</th><th>Action</th></tr></thead><tbody id="approvalsTable"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
+      </section>
+
+      <section id="section-voters" class="section hidden">
+        <h2>Voters</h2>
+        <div class="search-bar"><input id="searchVoters" placeholder="Search voters" oninput="loadVoters(this.value)"/></div>
+        <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Verified</th><th>Has Voted</th><th>Action</th></tr></thead><tbody id="voterTable"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
+      </section>
+
+      <section id="section-blocks" class="section hidden">
+        <h2>Blockchain Explorer</h2>
+        <div class="table-wrap"><table><thead><tr><th>Block ID</th><th>Hash</th><th>Tx Count</th><th>Timestamp</th></tr></thead><tbody id="blocksTable"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+      </section>
+
+      <section id="section-audit" class="section hidden">
+        <h2>Audit Logs</h2>
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Description</th></tr></thead><tbody id="auditTable"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalWrapper" class="hidden"></div>
+  <div class="notification-wrapper" id="notificationWrapper"></div>
+
+  <script>
+    const sectionIds = ['dashboard', 'elections', 'candidates', 'approvals', 'voters', 'blocks', 'audit'];
+    let currentSection = 'dashboard';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAdminAuth();
+      switchSection('dashboard');
+      await loadAll();
+      setInterval(()=>{ if(currentSection==='dashboard') loadDashboard(); }, 20000);
+    });
+
+    async function checkAdminAuth() {
+      try {
+        const res = await fetch(getApiUrl('auth.php?action=check_session'), {
+          method:'POST', headers:{'Content-Type':'application/json'}
+        });
+        const data = await res.json();
+        if (!data.success || data.data.user_type !== 'admin') {
+          window.location.href = 'login.html';
+          return;
+        }
+        document.getElementById('adminWelcome').textContent = `Welcome, ${data.data.full_name || 'Admin'}`;
+      } catch (err) {
+        console.error(err);
+        window.location.href = 'login.html';
+      }
+    }
+
+    function switchSection(name) {
+      currentSection = name;
+      sectionIds.forEach(id => {
+        const section = document.getElementById(`section-${id}`);
+        const link = document.querySelector(`.nav-link[data-section="${id}"]`);
+        if (section) section.classList.toggle('hidden', id !== name);
+        if (link) link.classList.toggle('active', id === name);
+      });
+      document.getElementById('pageTitle').textContent = name.charAt(0).toUpperCase()+name.slice(1).replace('-', ' ');
+      if (name==='elections') loadElections();
+      if (name==='candidates') loadCandidates();
+      if (name==='approvals') loadApprovals();
+      if (name==='voters') loadVoters();
+      if (name==='blocks') loadBlocks();
+      if (name==='audit') loadAudit();
+    }
+
+    async function loadAll() {
+      loadDashboard();
+      loadElections();
+      loadCandidates();
+      loadApprovals();
+      loadVoters();
+      loadBlocks();
+      loadAudit();
+    }
+
+    async function loadDashboard() {
+      try {
+        const [stats, elections, voters, audit] = await Promise.all([
+          fetch(getApiUrl('api/admin.php?action=get_blockchain_stats'), {method:'POST', headers:{'Content-Type':'application/json'}}).then(r=>r.json()),
+          fetch(getApiUrl('api/admin.php?action=get_elections'), {method:'POST', headers:{'Content-Type':'application/json'}}).then(r=>r.json()),
+          fetch(getApiUrl('api/admin.php?action=get_voters'), {method:'POST', headers:{'Content-Type':'application/json'}}).then(r=>r.json()),
+          fetch(getApiUrl('api/admin.php?action=get_audit_logs'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({limit:3})}).then(r=>r.json())
+        ]);
+
+        document.getElementById('blocksCount').textContent = (stats.success && stats.data.blockchain_stats) ? stats.data.blockchain_stats.total_blocks : 'N/A';
+        document.getElementById('votesCount').textContent = (stats.success && stats.data.blockchain_stats) ? stats.data.blockchain_stats.total_transactions : 'N/A';
+        document.getElementById('votersCount').textContent = (voters.success ? voters.data.count : 'N/A');
+        const active = (elections.success ? elections.data.elections.filter(e=>e.status==='ongoing').length : 0);
+        document.getElementById('activeElectionCount').textContent = active;
+
+        if (audit.success && audit.data.logs && audit.data.logs.length>0) {
+          document.getElementById('recentActivity').innerHTML = audit.data.logs.map(log => `<div style="margin-bottom:.4rem;"><strong>${log.action}</strong> by ${log.user_id||'System'} <br><small>${new Date(log.timestamp).toLocaleString()}</small></div>`).join('');
+        } else {
+          document.getElementById('recentActivity').textContent = 'No recent activity';
+        }
+      } catch (e) {
+        console.error(e);
+        showNotification('error','Unable to load dashboard data');
+      }
+    }
+
+    async function loadElections(search='') {
+      try {
+        const body = { status:'all', search };
+        const res = await fetch(getApiUrl('api/admin.php?action=get_elections'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+        const data = await res.json();
+        const tbody = document.getElementById('electionsTable');
+        if (!data.success || !Array.isArray(data.data.elections)) {
+          tbody.innerHTML = '<tr><td colspan="7">Could not load elections</td></tr>';
+          return;
+        }
+        if (data.data.elections.length===0) {
+          tbody.innerHTML = '<tr><td colspan="7">No elections found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.data.elections.map(e=>`<tr>
+          <td>${e.election_id}</td>
+          <td>${e.election_name}</td>
+          <td><span class="status-badge ${e.status}">${e.status}</span></td>
+          <td>${new Date(e.start_date).toLocaleString()}</td>
+          <td>${new Date(e.end_date).toLocaleString()}</td>
+          <td>${e.candidate_count || 0}</td>
+          <td>
+            ${e.status==='upcoming'?`<button class="btn btn-success" onclick="changeElectionStatus(${e.election_id}, 'start')">Start</button>`:''}
+            ${e.status==='ongoing'?`<button class="btn btn-warning" onclick="changeElectionStatus(${e.election_id}, 'end')">End</button>`:''}
+          </td>
+        </tr>`).join('');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('electionsTable').innerHTML = '<tr><td colspan="7">Error loading elections</td></tr>';
+      }
+    }
+
+    async function loadCandidates(search='') {
+      try {
+        const res = await fetch(getApiUrl('api/admin-candidates.php?action=get_candidates'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({search})});
+        const data = await res.json();
+        const tbody = document.getElementById('candidatesTable');
+        if (!data.success || !Array.isArray(data.data)) {
+          tbody.innerHTML = '<tr><td colspan="6">Could not load candidates</td></tr>';
+          return;
+        }
+        if (data.data.length===0) {tbody.innerHTML = '<tr><td colspan="6">No candidates found</td></tr>'; return;}
+        tbody.innerHTML = data.data.map(c=>`<tr>
+          <td>${c.candidate_id}</td>
+          <td>${c.full_name}</td>
+          <td>${c.party || 'Independent'}</td>
+          <td><span class="status-badge ${c.verification_status || 'pending'}">${c.verification_status || 'pending'}</span></td>
+          <td>${c.payment_status || 'unknown'}</td>
+          <td><button class="btn btn-primary" onclick="viewCandidate('${c.candidate_id}')">View</button></td>
+        </tr>`).join('');
+      } catch (error) {
+        console.error(error);
+        document.getElementById('candidatesTable').innerHTML = '<tr><td colspan="6">Error loading candidates</td></tr>';
+      }
+    }
+
+    async function loadApprovals() {
+      try {
+        const res = await fetch(getApiUrl('api/admin-candidate-registrations.php?action=get_pending_candidates'), {method:'GET'});
+        const data = await res.json();
+        const tbody = document.getElementById('approvalsTable');
+
+        if (!data.success || !Array.isArray(data.data)) {
+          tbody.innerHTML = '<tr><td colspan="6">Could not load approvals</td></tr>';
+          return;
+        }
+        if (data.data.length===0) {tbody.innerHTML = '<tr><td colspan="6">No registrations pending</td></tr>'; return;}
+
+        tbody.innerHTML = data.data.map(c=>`<tr>
+          <td>${c.candidate_id}</td>
+          <td>${c.full_name}</td>
+          <td>${c.email}</td>
+          <td>${c.party || 'Independent'}</td>
+          <td><span class="status-badge ${c.verification_status}">${c.verification_status}</span></td>
+          <td>
+            ${c.verification_status==='pending' ? `<button class="btn btn-success" onclick="approveCandidate('${c.candidate_id}')">Approve</button><button class="btn btn-danger" onclick="rejectCandidate('${c.candidate_id}')">Reject</button>` : '<em>Reviewed</em>'}
+          </td>
+        </tr>`).join('');
+      } catch (error) {
+        console.error(error);
+        document.getElementById('approvalsTable').innerHTML = '<tr><td colspan="6">Error loading approvals</td></tr>';
+      }
+    }
+
+    async function loadVoters(search='') {
+      try {
+        const res = await fetch(getApiUrl('api/admin.php?action=get_voters'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({search})});
+        const data = await res.json();
+        const tbody = document.getElementById('voterTable');
+        if (!data.success || !Array.isArray(data.data.voters)) {
+          tbody.innerHTML = '<tr><td colspan="6">Could not load voters</td></tr>';
+          return;
+        }
+        if (data.data.voters.length===0){tbody.innerHTML='<tr><td colspan="6">No voters found</td></tr>'; return;}
+        tbody.innerHTML = data.data.voters.map(v=>`<tr>
+          <td>${v.voter_id}</td>
+          <td>${v.full_name}</td>
+          <td>${v.email}</td>
+          <td><span class="status-badge ${v.is_verified? 'verified':'pending'}">${v.is_verified? 'Yes':'No'}</span></td>
+          <td><span class="status-badge ${v.has_voted? 'completed':'pending'}">${v.has_voted? 'Yes':'No'}</span></td>
+          <td><button class="btn btn-light" onclick="resetVoter('${v.voter_id}')">Reset</button></td>
+        </tr>`).join('');
+      } catch(e){console.error(e);document.getElementById('voterTable').innerHTML='<tr><td colspan="6">Error loading voters</td></tr>';}    }
+
+    async function loadBlocks() {
+      try {
+        const res = await fetch(getApiUrl('api/blocks.php'), {method:'GET'});
+        const data = await res.json();
+        const rows = (Array.isArray(data) ? data.slice(-15).reverse() : []);
+        const tbody = document.getElementById('blocksTable');
+        if (rows.length===0){tbody.innerHTML='<tr><td colspan="4">No blocks yet</td></tr>';return;}
+        tbody.innerHTML = rows.map(b=>`<tr>
+          <td>${b.block_id}</td>
+          <td>${b.block_hash.slice(0,10)}...</td>
+          <td>${b.transactions_count||0}</td>
+          <td>${new Date(b.timestamp).toLocaleString()}</td>
+        </tr>`).join('');
+      } catch(e){console.error(e);document.getElementById('blocksTable').innerHTML='<tr><td colspan="4">Error loading blocks</td></tr>';}    }
+
+    async function loadAudit() {
+      try {
+        const res = await fetch(getApiUrl('api/admin.php?action=get_audit_logs'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({limit:30})});
+        const data = await res.json();
+        const tbody = document.getElementById('auditTable');
+        if (!data.success||!Array.isArray(data.data.logs)) {tbody.innerHTML='<tr><td colspan="4">Could not load logs</td></tr>'; return;}
+        if (data.data.logs.length===0){tbody.innerHTML='<tr><td colspan="4">No logs found</td></tr>'; return;}    
+        tbody.innerHTML = data.data.logs.map(l=>`<tr><td>${new Date(l.timestamp).toLocaleString()}</td><td>${l.user_id||'System'}</td><td>${l.action}</td><td>${l.description}</td></tr>`).join('');
+      } catch(e){console.error(e);document.getElementById('auditTable').innerHTML='<tr><td colspan="4">Error loading audit logs</td></tr>';}    }
+
+    async function changeElectionStatus(id, mode) {
+      const action = (mode==='start'?'start_election':'end_election');
+      try {
+        const r = await fetch(getApiUrl(`admin.php?action=${action}`), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({election_id:id})});
+        const result = await r.json();
+        if (result.success) {showNotification('success', result.data.message); loadElections(); loadDashboard();}
+        else showNotification('error', result.error||'Failed');
+      } catch(e){console.error(e);showNotification('error','Action failed');}
+    }
+
+    async function approveCandidate(candidateId) {
+      if (!confirm('Approve this candidate?')) return;
+      try {
+        const r = await fetch(getApiUrl('api/admin-candidate-registrations.php?action=approve_candidate'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({candidate_id:candidateId})});
+        const result = await r.json();
+        if (result.success) {showNotification('success', result.message); loadApprovals(); loadCandidates();}
+        else showNotification('error', result.error || 'Failed');
+      } catch(e){console.error(e);showNotification('error','Server error');}
+    }
+
+    async function rejectCandidate(candidateId) {
+      const reason = prompt('Reason for rejection:');
+      if (reason===null) return;
+      try {
+        const r = await fetch(getApiUrl('api/admin-candidate-registrations.php?action=reject_candidate'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({candidate_id:candidateId, reason})});
+        const result = await r.json();
+        if (result.success) {showNotification('success', result.message); loadApprovals(); loadCandidates();}
+        else showNotification('error', result.error || 'Failed');
+      } catch(e){console.error(e);showNotification('error','Server error');}
+    }
+
+    async function resetVoter(voterId) {
+      if (!confirm('Reset this voter vote status?')) return;
+      try {
+        const r = await fetch(getApiUrl('api/admin.php?action=reset_voter_status'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({voter_id:voterId})});
+        const result = await r.json();
+        if (result.success) {showNotification('success', result.data.message); loadVoters();}
+        else showNotification('error', result.error || 'Failed');
+      } catch(e){console.error(e);showNotification('error','Server error');}
+    }
+
+    async function openElectionModal() {
+      const wrapper = document.getElementById('modalWrapper');
+      wrapper.innerHTML = `<div class="modal-backdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><h3>Create Election</h3><button onclick="closeModal()" class="btn btn-light">&times;</button></div><div class="modal-body"><label>Election Name</label><input id="newElectionName" type="text" style="width:100%;padding:.5rem;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:.5rem;"/><label>Description</label><textarea id="newElectionDesc" rows="3" style="width:100%;padding:.5rem;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:.5rem;"></textarea><label>Start Date</label><input id="newElectionStart" type="datetime-local" style="width:100%;padding:.5rem;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:.5rem;"/><label>End Date</label><input id="newElectionEnd" type="datetime-local" style="width:100%;padding:.5rem;border:1px solid #cbd5e1;border-radius:6px;margin-bottom:.5rem;"/></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="createElection()">Create</button></div></div></div>`;
+      wrapper.classList.remove('hidden');
+      const now = new Date();
+      const tomorrow = new Date(now.getTime() + 24*3600000);
+      const nextWeek = new Date(now.getTime() + 7*24*3600000);
+      document.getElementById('newElectionStart').value = formatLocalDate(tomorrow);
+      document.getElementById('newElectionEnd').value = formatLocalDate(nextWeek);
+    }
+
+    function closeModal() { document.getElementById('modalWrapper').classList.add('hidden'); document.getElementById('modalWrapper').innerHTML=''; }
+
+    function formatLocalDate(date) {
+      const pad = n => String(n).padStart(2,'0');
+      return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    async function createElection() {
+      const name = document.getElementById('newElectionName').value.trim();
+      const description = document.getElementById('newElectionDesc').value.trim();
+      const start_date = document.getElementById('newElectionStart').value;
+      const end_date = document.getElementById('newElectionEnd').value;
+      if (!name || !start_date || !end_date) { showNotification('error','Please fill required fields'); return; }
+      try {
+        const r = await fetch(getApiUrl('api/admin.php?action=create_election'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({election_name:name, description, start_date, end_date})});
+        const result = await r.json();
+        if (result.success) { showNotification('success','Election created'); closeModal(); loadElections(); loadDashboard(); }
+        else showNotification('error', result.error || 'Failed');
+      } catch (e) { console.error(e); showNotification('error','Server error'); }
+    }
+
+    function showNotification(type, msg) {
+      const wrapper = document.getElementById('notificationWrapper');
+      const el = document.createElement('div'); el.className = `notification ${type}`; el.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;">&times;</button>`;
+      wrapper.appendChild(el);
+      setTimeout(()=>el.remove(), 4500);
+    }
+
+    async function viewCandidate(candidateId) {
+      try {
+        const res = await fetch(getApiUrl('api/admin-candidates.php?action=get_candidate_details'), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({candidate_id:candidateId})});
+        const data = await res.json();
+        if (!data.success) { showNotification('error', data.error || 'Failed'); return; }
+        const candidate = data.data;
+        const wrapper = document.getElementById('modalWrapper');
+        wrapper.innerHTML = `<div class="modal-backdrop" onclick="closeModal()"><div class="modal" onclick="event.stopPropagation()"><div class="modal-header"><h3>${candidate.full_name}</h3><button onclick="closeModal()" class="btn btn-light">&times;</button></div><div class="modal-body"><p><strong>Party:</strong> ${candidate.party}</p><p><strong>Email:</strong> ${candidate.email}</p><p><strong>Good Conduct:</strong> ${candidate.good_conduct}</p><p><strong>BSc Degree:</strong> ${candidate.has_bsc_degree}</p></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div></div></div>`;
+        wrapper.classList.remove('hidden');
+      } catch (e) { console.error(e); showNotification('error','Error fetching candidate'); }
+    }
+
+    function logout() {
+      fetch(getApiUrl('auth.php?action=logout'),{method:'POST',headers:{'Content-Type':'application/json'}}).finally(()=>window.location.href='login.html');
+    }
+  </script>
+</body>
+</html>

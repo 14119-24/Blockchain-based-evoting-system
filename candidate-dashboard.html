@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Dashboard - BlockVote</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/api-helper.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="brand">
+                <i class="fas fa-user-tie"></i>
+                <span>BlockVote Candidate</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <span id="candidate-name">Loading...</span>
+                <button onclick="logoutCandidate()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <sidebar class="sidebar">
+            <nav class="sidebar-menu">
+                <button class="menu-item active" onclick="switchPanel('overview', event)">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard Overview</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('campaign', event)">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Campaign Info</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('votes', event)">
+                    <i class="fas fa-poll"></i>
+                    <span>Vote Results</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('elections', event)">
+                    <i class="fas fa-landmark"></i>
+                    <span>Elections</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('analytics', event)">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('profile', event)">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('campaign_management', event)">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Campaign Tools</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('demographics', event)">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Demographics</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('blockchain', event)">
+                    <i class="fas fa-chain"></i>
+                    <span>Blockchain Verification</span>
+                </button>
+                <button class="menu-item" onclick="switchPanel('disputes', event)">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Vote Disputes</span>
+                </button>
+            </nav>
+        </sidebar>
+
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section class="panel" id="panel-overview">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-vote-yea"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Votes</h3>
+                            <p class="stat-value" id="total-votes">0</p>
+                            <small id="vote-percentage">0% of votes</small>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chain"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Blockchain Blocks</h3>
+                            <p class="stat-value" id="blockchain-blocks">0</p>
+                            <small>Verified blocks</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vote Chart -->
+                <div class="chart-container" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-chart-pie"></i> Vote Distribution</h3>
+                    <canvas id="voteChart"></canvas>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    <div class="activity-list" id="activity-list">
+                        <p>Loading activity...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Campaign Info -->
+            <section class="panel hidden" id="panel-campaign">
+                <div class="panel-header">
+                    <h2><i class="fas fa-bullhorn"></i> Campaign Information</h2>
+                </div>
+
+                <div class="campaign-card">
+                    <div class="campaign-header">
+                        <h3 id="campaign-name">Loading...</h3>
+                        <span id="campaign-party" class="badge badge-primary">Party</span>
+                    </div>
+
+                    <div class="campaign-details">
+                        <div class="detail-group">
+                            <label>Party Affiliation:</label>
+                            <p id="campaign-party-full">Loading...</p>
+                        </div>
+
+                        <div class="detail-group">
+                            <label>Email:</label>
+                            <p id="campaign-email">Loading...</p>
+                        </div>
+
+                        <div class="detail-group">
+                            <label>Phone:</label>
+                            <p id="campaign-phone">Loading...</p>
+                        </div>
+
+                        <div class="detail-group">
+                            <label>Campaign Vision & Goals:</label>
+                            <p id="campaign-vision" style="white-space: pre-wrap;">Loading...</p>
+                        </div>
+
+                        <div class="detail-group">
+                            <label>Experience & Qualifications:</label>
+                            <p id="campaign-experience" style="white-space: pre-wrap;">Loading...</p>
+                        </div>
+
+                        <div class="detail-group">
+                            <label>Registration Status:</label>
+                            <p>
+                                <span id="campaign-status" class="badge badge-success">Verified</span>
+                                <small id="verification-date">Date: Loading...</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Elections Tracker -->
+            <section class="panel hidden" id="panel-elections">
+                <div class="panel-header">
+                    <h2><i class="fas fa-landmark"></i> Elections Tracker</h2>
+                </div>
+
+                <div class="election-controls">
+                    <div class="filter-group">
+                        <button class="filter-btn active" onclick="loadElections('all', this)">All</button>
+                        <button class="filter-btn" onclick="loadElections('ongoing', this)">Ongoing</button>
+                        <button class="filter-btn" onclick="loadElections('upcoming', this)">Upcoming</button>
+                        <button class="filter-btn" onclick="loadElections('completed', this)">Completed</button>
+                    </div>
+                    <div class="search-group">
+                        <input id="election-search" type="search" placeholder="Search elections..." oninput="filterElections()" />
+                    </div>
+                </div>
+
+                <div class="elections-grid" id="elections-list">
+                    <p>Loading elections...</p>
+                </div>
+            </section>
+
+            <!-- Vote Results -->
+            <section class="panel hidden" id="panel-votes">
+                <div class="panel-header">
+                    <h2><i class="fas fa-poll"></i> Vote Results</h2>
+                </div>
+
+                <div class="results-container">
+                    <div class="result-card" id="results-placeholder">
+                        <p>Loading results...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics -->
+            <section class="panel hidden" id="panel-analytics">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chart-bar"></i> Campaign Analytics</h2>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-line-chart"></i> Vote Trend</h3>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-map"></i> Geographic Distribution</h3>
+                        <div id="geo-data">
+                            <p>Loading geographic data...</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-clock"></i> Peak Voting Times</h3>
+                        <div id="time-data">
+                            <p>Loading time data...</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-users"></i> Voter Demographics</h3>
+                        <div id="demo-data">
+                            <p>Loading demographic data...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile -->
+            <section class="panel hidden" id="panel-profile">
+                <div class="panel-header">
+                    <h2><i class="fas fa-user-circle"></i> Candidate Profile</h2>
+                </div>
+
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <h3>Eligibility Status</h3>
+                        <div class="eligibility-list">
+                            <div class="eligibility-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>BSc Degree:</span>
+                                <strong id="profile-degree">✓ Verified</strong>
+                            </div>
+                            <div class="eligibility-item">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span>Age:</span>
+                                <strong id="profile-age">✓ 21+</strong>
+                            </div>
+                            <div class="eligibility-item">
+                                <i class="fas fa-heart"></i>
+                                <span>Good Conduct:</span>
+                                <strong id="profile-conduct">✓ Verified</strong>
+                            </div>
+                            <div class="eligibility-item">
+                                <i class="fas fa-users"></i>
+                                <span>Party Membership:</span>
+                                <strong id="profile-party">Loading...</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3>Registration Details</h3>
+                        <div class="detail-group">
+                            <label>Candidate ID:</label>
+                            <p id="profile-id">Loading...</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Registration Date:</label>
+                            <p id="profile-reg-date">Loading...</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Payment Status:</label>
+                            <p><span id="profile-payment" class="badge badge-success">Paid - 1000 USD</span></p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Account Status:</label>
+                            <p><span id="profile-account-status" class="badge badge-success">Active</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Campaign Management -->
+            <section class="panel hidden" id="panel-campaign_management">
+                <div class="panel-header">
+                    <h2><i class="fas fa-bullhorn"></i> Campaign Management Tools</h2>
+                </div>
+
+                <div class="campaign-section">
+                    <h3><i class="fas fa-flag"></i> Campaign Goals</h3>
+                    <button class="btn btn-primary" onclick="showAddGoalModal()" style="margin-bottom: 1rem;">
+                        <i class="fas fa-plus"></i> Add Goal
+                    </button>
+                    <div id="goals-list" class="goals-grid">
+                        <p>Loading campaign goals...</p>
+                    </div>
+                </div>
+
+                <div class="campaign-section" style="margin-top: 2rem;">
+                    <h3><i class="fas fa-newspaper"></i> Campaign Posts</h3>
+                    <button class="btn btn-primary" onclick="showAddPostModal()" style="margin-bottom: 1rem;">
+                        <i class="fas fa-plus"></i> New Post
+                    </button>
+                    <div id="posts-list" class="posts-list">
+                        <p>Loading campaign posts...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Voter Demographics & Insights -->
+            <section class="panel hidden" id="panel-demographics">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chart-pie"></i> Voter Demographics & Insights</h2>
+                </div>
+
+                <div class="demographics-grid">
+                    <div class="demographic-card">
+                        <h3><i class="fas fa-birthday-cake"></i> Age Distribution</h3>
+                        <div id="age-distribution" class="demographic-chart">
+                            <p>Loading age data...</p>
+                        </div>
+                    </div>
+
+                    <div class="demographic-card">
+                        <h3><i class="fas fa-map-marker-alt"></i> Geographic Distribution</h3>
+                        <div id="geo-distribution" class="demographic-chart">
+                            <p>Loading geographic data...</p>
+                        </div>
+                    </div>
+
+                    <div class="demographic-card">
+                        <h3><i class="fas fa-users"></i> Gender Distribution</h3>
+                        <div id="gender-distribution" class="demographic-chart">
+                            <p>Loading gender data...</p>
+                        </div>
+                    </div>
+
+                    <div class="demographic-card">
+                        <h3><i class="fas fa-lightbulb"></i> Voter Insights</h3>
+                        <div id="voter-insights">
+                            <p>Loading insights...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blockchain Verification -->
+            <section class="panel hidden" id="panel-blockchain">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chain"></i> Secure Blockchain Verification</h2>
+                </div>
+
+                <div class="blockchain-container">
+                    <div class="verification-summary">
+                        <h3>Verification Status</h3>
+                        <div class="verification-grid">
+                            <div class="verification-card">
+                                <h4>Current Block Hash</h4>
+                                <code id="current-block-hash" style="word-break: break-all;">Loading...</code>
+                            </div>
+                            <div class="verification-card">
+                                <h4>Merkle Root</h4>
+                                <code id="merkle-root" style="word-break: break-all;">Loading...</code>
+                            </div>
+                            <div class="verification-card">
+                                <h4>Verified Votes</h4>
+                                <p class="stat-value" id="verified-votes">0</p>
+                            </div>
+                            <div class="verification-card">
+                                <h4>Verification Timestamp</h4>
+                                <p id="verification-timestamp">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="blockchain-history" style="margin-top: 2rem;">
+                        <h3>Blockchain History</h3>
+                        <div id="blockchain-records">
+                            <p>Loading blockchain records...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vote Dispute Resolution -->
+            <section class="panel hidden" id="panel-disputes">
+                <div class="panel-header">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Vote Dispute Resolution</h2>
+                </div>
+
+                <div class="disputes-container">
+                    <div class="dispute-actions">
+                        <button class="btn btn-warning" onclick="showReportDisputeModal()" style="margin-bottom: 1rem;">
+                            <i class="fas fa-report"></i> Report Dispute
+                        </button>
+                    </div>
+
+                    <div class="disputes-list">
+                        <h3><i class="fas fa-list"></i> Your Disputes</h3>
+                        <div id="disputes-items">
+                            <p>No disputes reported yet.</p>
+                        </div>
+                    </div>
+
+                    <div class="dispute-guidelines" style="margin-top: 2rem; padding: 1.5rem; background-color: #f0f4ff; border-radius: 0.75rem;">
+                        <h3><i class="fas fa-book"></i> Dispute Guidelines</h3>
+                        <ul style="margin-left: 1.5rem; margin-top: 1rem;">
+                            <li><strong>Illegitimate Vote:</strong> Report votes that appear fraudulent or invalid</li>
+                            <li><strong>Duplicate Vote:</strong> Report duplicate voter entries</li>
+                            <li><strong>System Error:</strong> Report technical errors in vote counting</li>
+                            <li><strong>Fraud Allegation:</strong> Report suspected election fraud</li>
+                        </ul>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray-color);">
+                            All disputes are reviewed by the election commission. Provide evidence when possible.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div id="addGoalModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Campaign Goal</h2>
+                <button class="modal-close" onclick="document.getElementById('addGoalModal').style.display = 'none';">&times;</button>
+            </div>
+            <form onsubmit="submitAddGoal(event)">
+                <div class="form-group">
+                    <label>Goal Name</label>
+                    <input type="text" id="goal-name" required placeholder="e.g., Reach 5000 votes">
+                </div>
+                <div class="form-group">
+                    <label>Goal Description</label>
+                    <textarea id="goal-description" placeholder="Describe your goal..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Target Votes</label>
+                    <input type="number" id="goal-target-votes" required placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label>Target Date (Optional)</label>
+                    <input type="date" id="goal-target-date">
+                </div>
+                <button type="submit" class="btn btn-success">Create Goal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Post Modal -->
+    <div id="addPostModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Campaign Post</h2>
+                <button class="modal-close" onclick="document.getElementById('addPostModal').style.display = 'none';">&times;</button>
+            </div>
+            <form onsubmit="submitAddPost(event)">
+                <div class="form-group">
+                    <label>Post Title</label>
+                    <input type="text" id="post-title" required placeholder="Post title...">
+                </div>
+                <div class="form-group">
+                    <label>Post Type</label>
+                    <select id="post-type">
+                        <option value="announcement">Announcement</option>
+                        <option value="policy">Policy</option>
+                        <option value="event">Event</option>
+                        <option value="achievement">Achievement</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Post Content</label>
+                    <textarea id="post-content" required placeholder="Your message..." rows="6"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Post</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Report Dispute Modal -->
+    <div id="reportDisputeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Report Vote Dispute</h2>
+                <button class="modal-close" onclick="document.getElementById('reportDisputeModal').style.display = 'none';">&times;</button>
+            </div>
+            <form onsubmit="submitReportDispute(event)">
+                <div class="form-group">
+                    <label>Dispute Type</label>
+                    <select id="dispute-type" required>
+                        <option value="">Select type...</option>
+                        <option value="illegitimate_vote">Illegitimate Vote</option>
+                        <option value="duplicate_vote">Duplicate Vote</option>
+                        <option value="system_error">System Error</option>
+                        <option value="fraud_allegation">Fraud Allegation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="dispute-description" required placeholder="Describe the dispute..." rows="6"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Evidence URL (Optional)</label>
+                    <input type="url" id="dispute-evidence" placeholder="https://example.com/evidence">
+                </div>
+                <button type="submit" class="btn btn-warning">Report Dispute</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .campaign-section {
+            margin-bottom: 2rem;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .goal-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .goal-card h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .goal-progress {
+            margin: 1rem 0;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .post-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .post-card h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .post-meta {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            margin-bottom: 1rem;
+        }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .demographic-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .demographic-chart {
+            margin-top: 1rem;
+            min-height: 200px;
+        }
+
+        .demographic-chart .chart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+        }
+
+        .verification-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .verification-card h4 {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .verification-card code {
+            background-color: #f3f4f6;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        .blockchain-records {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .dispute-card {
+            background: white;
+            border-left: 4px solid var(--warning-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .dispute-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-investigating {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-resolved {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+    </style>
+    <script>
+        let candidateData = null;
+        let voteChart = null;
+        let trendChart = null;
+        let allElections = [];
+
+        function getApiUrl(endpoint) {
+            return '../api/' + endpoint;
+        }
+
+        function checkCandidateAuth() {
+            const candidateId = sessionStorage.getItem('candidate_id');
+            if (!candidateId) {
+                window.location.href = 'candidate-register.html';
+                return false;
+            }
+            return true;
+        }
+
+        function switchPanel(panelName, event) {
+            // Hide all panels
+            document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+            // Show selected panel
+            document.getElementById(`panel-${panelName}`).classList.remove('hidden');
+            if (event && event.target) {
+                const menuItem = event.target.closest('.menu-item');
+                if (menuItem) menuItem.classList.add('active');
+            }
+
+            // Load specific data for the panel
+            if (panelName === 'votes') {
+                loadVoteResults();
+            } else if (panelName === 'analytics') {
+                loadAnalytics();
+            } else if (panelName === 'profile') {
+                loadProfile();
+            } else if (panelName === 'campaign') {
+                loadCampaign();
+            } else if (panelName === 'elections') {
+                loadElections('ongoing');
+            } else if (panelName === 'campaign_management') {
+                loadCampaignManagement();
+            } else if (panelName === 'demographics') {
+                loadDemographics();
+            } else if (panelName === 'blockchain') {
+                loadBlockchainVerification();
+            } else if (panelName === 'disputes') {
+                loadVoteDisputes();
+            }
+        }
+
+        async function loadCandidateData() {
+            try {
+                // First, try to get candidate data from server session
+                const response = await fetch(getApiUrl('candidate-auth.php?action=check_candidate_session'), {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    candidateData = data.data;
+                    // Update sessionStorage with the latest data
+                    sessionStorage.setItem('candidate_id', candidateData.candidate_id);
+                    sessionStorage.setItem('candidate_name', candidateData.full_name);
+                    document.getElementById('candidate-name').textContent = candidateData.full_name;
+                    
+                    // Load dashboard overview and also populate campaign/profile sections immediately
+                    loadDashboardOverview();
+                    loadCampaign();
+                    loadProfile();
+                } else {
+                    // If server session not found, create basic candidate object from sessionStorage
+                    const candidateId = sessionStorage.getItem('candidate_id');
+                    const candidateName = sessionStorage.getItem('candidate_name');
+                    
+                    if (candidateId && candidateName) {
+                        // Build temporary candidate object
+                        candidateData = {
+                            candidate_id: candidateId,
+                            full_name: candidateName
+                        };
+                        document.getElementById('candidate-name').textContent = candidateName;
+                        loadDashboardOverview();
+                        loadCampaign();
+                        loadProfile();
+                    } else {
+                        logoutCandidate();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading candidate data:', error);
+                // Fallback: check if we have sessionStorage data
+                const candidateId = sessionStorage.getItem('candidate_id');
+                const candidateName = sessionStorage.getItem('candidate_name');
+                
+                if (candidateId && candidateName) {
+                    candidateData = {
+                        candidate_id: candidateId,
+                        full_name: candidateName
+                    };
+                    document.getElementById('candidate-name').textContent = candidateName;
+                    loadDashboardOverview();
+                    loadCampaign();
+                    loadProfile();
+                } else {
+                    logoutCandidate();
+                }
+            }
+        }
+
+        async function loadDashboardOverview() {
+            try {
+                const response = await fetch(getApiUrl('candidates.php?action=get_stats'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: sessionStorage.getItem('candidate_id') })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.data;
+                    
+                    document.getElementById('total-votes').textContent = stats.total_votes || 0;
+                    document.getElementById('blockchain-blocks').textContent = stats.blockchain_blocks || 0;
+
+                    const votePercentage = stats.total_voters > 0 
+                        ? Math.round((stats.total_votes / stats.total_voters) * 100) 
+                        : 0;
+                    document.getElementById('vote-percentage').textContent = `${votePercentage}% of votes`;
+
+                    // Populate campaign info from session data if available
+                    if (candidateData) {
+                        document.getElementById('campaign-name').textContent = candidateData.full_name || 'Not specified';
+                        document.getElementById('campaign-party').textContent = candidateData.party || 'Unknown';
+                        document.getElementById('campaign-party-full').textContent = candidateData.party || 'Unknown';
+                        document.getElementById('campaign-email').textContent = candidateData.email || 'Not specified';
+                        document.getElementById('campaign-phone').textContent = candidateData.phone || 'Not specified';
+                        document.getElementById('campaign-status').textContent = candidateData.verification_status ? candidateData.verification_status.toUpperCase() : 'N/A';
+                        document.getElementById('campaign-status').className = `badge badge-${candidateData.verification_status === 'verified' ? 'success' : candidateData.verification_status === 'pending' ? 'warning' : 'danger'}`;
+                        document.getElementById('verification-date').textContent = 'Date: ' + (candidateData.created_at ? new Date(candidateData.created_at).toLocaleDateString() : 'N/A');
+                    }
+
+                    // Initialize vote chart
+                    initVoteChart(stats.votes_by_candidate || []);
+                }
+
+                loadRecentActivity();
+                loadElections('ongoing');
+                loadCampaignManagement();
+                loadDemographics();
+                loadBlockchainVerification();
+                loadVoteDisputes();
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('activity-list').innerHTML = '<p>Unable to load activity right now.</p>';
+                loadElections('ongoing');
+                loadCampaignManagement();
+                loadDemographics();
+                loadBlockchainVerification();
+                loadVoteDisputes();
+            }
+        }
+
+        function initVoteChart(voteData) {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js is not available; skipping vote chart.');
+                return;
+            }
+
+            const ctx = document.getElementById('voteChart').getContext('2d');
+            
+            if (voteChart) {
+                voteChart.destroy();
+            }
+
+            voteChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: voteData.map(v => v.candidate_name),
+                    datasets: [{
+                        data: voteData.map(v => v.vote_count),
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initTrendChart(trendData) {
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js is not available; skipping trend chart.');
+                return;
+            }
+
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            if (trendChart) {
+                trendChart.destroy();
+            }
+
+            // Reverse the data to show chronological order (oldest to newest)
+            const reversedData = trendData.slice().reverse();
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: reversedData.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Daily Votes',
+                        data: reversedData.map(d => d.votes),
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxTicksLimit: 7
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadRecentActivity() {
+            try {
+                const response = await fetch(getApiUrl('candidates.php?action=get_activity'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: sessionStorage.getItem('candidate_id') })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    const activityHtml = data.data.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>${activity.description}</strong></p>
+                                <small>${new Date(activity.timestamp).toLocaleString()}</small>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('activity-list').innerHTML = activityHtml;
+                } else {
+                    document.getElementById('activity-list').innerHTML = '<p>No recent activity yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading activity:', error);
+                document.getElementById('activity-list').innerHTML = '<p>Unable to load activity right now.</p>';
+            }
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'vote': 'poll',
+                'verification': 'check-circle',
+                'login': 'sign-in-alt',
+                'update': 'edit'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        async function loadElections(status = 'ongoing', button = null) {
+            const electionsList = document.getElementById('elections-list');
+            electionsList.innerHTML = '<p>Loading elections...</p>';
+
+            if (button) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            }
+
+            try {
+                const response = await fetch(getApiUrl('admin.php?action=get_public_elections'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    electionsList.innerHTML = `<p class="error">${data.error || 'Could not load elections.'}</p>`;
+                    return;
+                }
+
+                allElections = (data.data && Array.isArray(data.data.elections)) ? data.data.elections : (data.elections || []);
+
+                if (allElections.length === 0) {
+                    electionsList.innerHTML = '<p>No elections found for this category.</p>';
+                    return;
+                }
+
+                const cards = allElections.map(election => {
+                    const start = new Date(election.start_date).toLocaleDateString();
+                    const end = new Date(election.end_date).toLocaleDateString();
+                    const statusBadge = `
+                        <span class="status ${election.status}">${election.status.replace('_', ' ').toUpperCase()}</span>
+                    `;
+                    const progress = election.vote_count && election.candidate_count ?
+                        Math.min(100, Math.round((election.vote_count / (election.candidate_count * 1000)) * 100)) : 0;
+                    
+                    // Build results display
+                    const resultsHtml = election.results && election.results.length > 0 ? `
+                        <div class="election-results">
+                            <h4><i class="fas fa-poll"></i> Results</h4>
+                            <div class="results-list">
+                                ${election.results.slice(0, 3).map(result => `
+                                    <div class="result-row">
+                                        <span class="result-name">${result.candidate_name}</span>
+                                        <span class="result-votes">${result.votes} votes</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${election.results.length > 3 ? `<small>${election.results.length - 3} more candidates</small>` : ''}
+                        </div>
+                    ` : '';
+
+                    return `
+                        <article class="election-card">
+                            <div class="election-card-header">
+                                <h3>${election.election_name}</h3>
+                                ${statusBadge}
+                            </div>
+                            <p>${election.description || 'No description provided.'}</p>
+                            <div class="election-details">
+                                <span><strong>Start:</strong> ${start}</span>
+                                <span><strong>End:</strong> ${end}</span>
+                                <span><strong>Candidates:</strong> ${election.candidate_count}</span>
+                                <span><strong>Votes:</strong> ${election.vote_count}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%;"></div>
+                            </div>
+                            <small>Turnout estimate: ${progress}%</small>
+                            ${resultsHtml}
+                        </article>
+                    `;
+                }).join('');
+
+                electionsList.innerHTML = cards;
+            } catch (error) {
+                console.error('Error loading elections:', error);
+                electionsList.innerHTML = '<p class="error">Network error while fetching elections.</p>';
+            }
+        }
+
+        function filterElections() {
+            const query = document.getElementById('election-search').value.toLowerCase();
+            const filtered = allElections.filter(e =>
+                e.election_name.toLowerCase().includes(query) ||
+                (e.description || '').toLowerCase().includes(query) ||
+                (e.status || '').toLowerCase().includes(query)
+            );
+
+            const electionsList = document.getElementById('elections-list');
+            if (filtered.length === 0) {
+                electionsList.innerHTML = '<p>No elections match your search.</p>';
+                return;
+            }
+
+            electionsList.innerHTML = filtered.map(election => {
+                const start = new Date(election.start_date).toLocaleDateString();
+                const end = new Date(election.end_date).toLocaleDateString();
+                const statusBadge = `
+                    <span class="status ${election.status}">${election.status.replace('_', ' ').toUpperCase()}</span>
+                `;
+                const progress = election.vote_count && election.candidate_count ?
+                    Math.min(100, Math.round((election.vote_count / (election.candidate_count * 1000)) * 100)) : 0;
+                
+                // Build results display
+                const resultsHtml = election.results && election.results.length > 0 ? `
+                    <div class="election-results">
+                        <h4><i class="fas fa-poll"></i> Results</h4>
+                        <div class="results-list">
+                            ${election.results.slice(0, 3).map(result => `
+                                <div class="result-row">
+                                    <span class="result-name">${result.candidate_name}</span>
+                                    <span class="result-votes">${result.votes} votes</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${election.results.length > 3 ? `<small>${election.results.length - 3} more candidates</small>` : ''}
+                    </div>
+                ` : '';
+
+                return `
+                    <article class="election-card">
+                        <div class="election-card-header">
+                            <h3>${election.election_name}</h3>
+                            ${statusBadge}
+                        </div>
+                        <p>${election.description || 'No description provided.'}</p>
+                        <div class="election-details">
+                            <span><strong>Start:</strong> ${start}</span>
+                            <span><strong>End:</strong> ${end}</span>
+                            <span><strong>Candidates:</strong> ${election.candidate_count}</span>
+                            <span><strong>Votes:</strong> ${election.vote_count}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%;"></div>
+                        </div>
+                        <small>Turnout estimate: ${progress}%</small>
+                        ${resultsHtml}
+                    </article>
+                `;
+            }).join('');
+        }
+
+
+        async function loadVoteResults() {
+            try {
+                const response = await fetch(getApiUrl('candidates.php?action=get_vote_results'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: sessionStorage.getItem('candidate_id') })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (!data.data.candidates || data.data.candidates.length === 0) {
+                        document.getElementById('results-placeholder').innerHTML =
+                            '<div class="results-header"><p>Total Votes: 0</p></div><p>No vote results available yet.</p>';
+                        return;
+                    }
+
+                    const resultsHtml = data.data.candidates.map(candidate => {
+                        const percentage = data.data.total_votes > 0 
+                            ? Math.round((candidate.votes / data.data.total_votes) * 100) 
+                            : 0;
+
+                        return `
+                            <div class="result-item">
+                                <div class="result-header">
+                                    <h4>${candidate.name}</h4>
+                                    <span class="result-party">${candidate.party}</span>
+                                </div>
+                                <div class="result-bar">
+                                    <div class="result-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <div class="result-stats">
+                                    <span class="votes">${candidate.votes} votes</span>
+                                    <span class="percentage">${percentage}%</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('results-placeholder').innerHTML = 
+                        `<div class="results-header"><p>Total Votes: ${data.data.total_votes}</p></div>` + resultsHtml;
+                } else {
+                    document.getElementById('results-placeholder').innerHTML = '<p>Unable to load results.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('results-placeholder').innerHTML = '<p>Unable to load results.</p>';
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch(getApiUrl('candidates.php?action=get_analytics'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate_id: sessionStorage.getItem('candidate_id') })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const analytics = data.data;
+                    
+                    // Update vote trend chart
+                    initTrendChart(analytics.vote_trend);
+                    
+                    // Update geographic distribution
+                    const geoHtml = analytics.geographic.map(item => `
+                        <div class="geo-item">
+                            <span>${item.region}: ${item.votes} votes</span>
+                            <div class="mini-bar" style="width: ${item.percentage}%"></div>
+                        </div>
+                    `).join('');
+                    document.getElementById('geo-data').innerHTML = geoHtml;
+                    
+                    // Update peak voting times
+                    const timeHtml = analytics.peak_times.map(item => {
+                        const hour = item.hour.toString().padStart(2, '0') + ':00';
+                        return `
+                            <div class="time-item">
+                                <span>${hour}: ${item.votes} votes</span>
+                                <div class="mini-bar" style="width: ${Math.min(100, (item.votes / Math.max(...analytics.peak_times.map(t => t.votes))) * 100)}%"></div>
+                            </div>
+                        `;
+                    }).join('');
+                    document.getElementById('time-data').innerHTML = timeHtml;
+                    
+                    // Update voter demographics
+                    const demoHtml = analytics.demographics.map(item => `
+                        <div class="demo-item">
+                            <span>${item.age_group}: ${item.count} voters</span>
+                            <div class="mini-bar" style="width: ${item.percentage}%"></div>
+                        </div>
+                    `).join('');
+                    document.getElementById('demo-data').innerHTML = demoHtml;
+                    
+                } else {
+                    console.error('Analytics error:', data.error);
+                    // Fallback to placeholder data
+                    const geoHtml = `
+                        <div class="geo-item">
+                            <span>Data not available</span>
+                            <div class="mini-bar" style="width: 0%"></div>
+                        </div>
+                    `;
+                    document.getElementById('geo-data').innerHTML = geoHtml;
+                    document.getElementById('time-data').innerHTML = '<p>Data not available</p>';
+                    document.getElementById('demo-data').innerHTML = '<p>Data not available</p>';
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                // Fallback to placeholder data
+                const geoHtml = `
+                    <div class="geo-item">
+                        <span>Unable to load data</span>
+                        <div class="mini-bar" style="width: 0%"></div>
+                    </div>
+                `;
+                document.getElementById('geo-data').innerHTML = geoHtml;
+                document.getElementById('time-data').innerHTML = '<p>Unable to load data</p>';
+                document.getElementById('demo-data').innerHTML = '<p>Unable to load data</p>';
+            }
+        }
+
+        async function loadProfile() {
+            if (!candidateData) return;
+
+            document.getElementById('profile-id').textContent = candidateData.candidate_id;
+            document.getElementById('profile-reg-date').textContent = 
+                candidateData.created_at ? new Date(candidateData.created_at).toLocaleDateString() : 'N/A';
+            document.getElementById('profile-party').textContent = candidateData.party || 'Unknown';
+            document.getElementById('profile-degree').textContent = candidateData.has_bsc_degree ? '✓ Verified' : '⚠ Not set';
+            document.getElementById('profile-age').textContent = candidateData.age ? `${candidateData.age} yrs` : '21+';
+            document.getElementById('profile-conduct').textContent = candidateData.good_conduct ? '✓ Verified' : '⚠ Needs update';
+            document.getElementById('profile-payment').textContent = candidateData.payment_status ? candidateData.payment_status.replace('_', ' ').toUpperCase() : 'Unknown';
+            document.getElementById('profile-account-status').textContent = candidateData.verification_status ? candidateData.verification_status.toUpperCase() : 'Unknown';
+        }
+
+        async function loadCampaign() {
+            if (!candidateData) return;
+
+            // The campaign data is already populated in loadDashboardOverview
+            // But we can refresh it here if needed
+            document.getElementById('campaign-name').textContent = candidateData.full_name || 'Not specified';
+            document.getElementById('campaign-party').textContent = candidateData.party || 'Unknown';
+            document.getElementById('campaign-party-full').textContent = candidateData.party || 'Unknown';
+            document.getElementById('campaign-email').textContent = candidateData.email || 'Not specified';
+            document.getElementById('campaign-phone').textContent = candidateData.phone || 'Not specified';
+            document.getElementById('campaign-vision').textContent = candidateData.campaign_vision || 'Not specified';
+            document.getElementById('campaign-experience').textContent = candidateData.experience || 'Not specified';
+            document.getElementById('campaign-status').textContent = candidateData.verification_status ? candidateData.verification_status.toUpperCase() : 'N/A';
+            document.getElementById('campaign-status').className = `badge badge-${candidateData.verification_status === 'verified' ? 'success' : candidateData.verification_status === 'pending' ? 'warning' : 'danger'}`;
+            document.getElementById('verification-date').textContent = 'Date: ' + (candidateData.created_at ? new Date(candidateData.created_at).toLocaleDateString() : 'N/A');
+        }
+
+        async function loadCampaignManagement() {
+            try {
+                // Load campaign goals
+                const goalsResponse = await fetch(getApiUrl('campaign-management.php?action=get_campaign_goals'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const goalsData = await goalsResponse.json();
+                if (goalsData.success && goalsData.data.length > 0) {
+                    const goalsHtml = goalsData.data.map(goal => `
+                        <div class="goal-card">
+                            <h4>${goal.goal_name}</h4>
+                            <small style="color: var(--gray-color);">${goal.goal_description || 'No description'}</small>
+                            <div class="goal-progress">
+                                <div class="goal-progress-fill" style="width: ${goal.progress_percentage}%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                <span>${goal.current_progress} / ${goal.target_votes} votes</span>
+                                <span class="badge badge-${goal.status === 'completed' ? 'success' : goal.status === 'active' ? 'primary' : 'secondary'}">${goal.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                    document.getElementById('goals-list').innerHTML = goalsHtml;
+                } else {
+                    document.getElementById('goals-list').innerHTML = '<p>No campaign goals added yet.</p>';
+                }
+
+                // Load campaign posts
+                const postsResponse = await fetch(getApiUrl('campaign-management.php?action=get_campaign_posts'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const postsData = await postsResponse.json();
+                if (postsData.success && postsData.data.length > 0) {
+                    const postsHtml = postsData.data.map(post => `
+                        <div class="post-card">
+                            <h4>${post.title}</h4>
+                            <div class="post-meta">
+                                <i class="fas fa-tag"></i> ${post.post_type} • 
+                                <i class="fas fa-eye"></i> ${post.views} views • 
+                                ${new Date(post.created_at).toLocaleDateString()}
+                            </div>
+                            <p>${post.content.substring(0, 200)}...</p>
+                        </div>
+                    `).join('');
+                    document.getElementById('posts-list').innerHTML = postsHtml;
+                } else {
+                    document.getElementById('posts-list').innerHTML = '<p>No campaign posts published yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading campaign management:', error);
+                document.getElementById('goals-list').innerHTML = '<p>Campaign goals are not available right now.</p>';
+                document.getElementById('posts-list').innerHTML = '<p>Campaign posts are not available right now.</p>';
+            }
+        }
+
+        async function loadDemographics() {
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=get_voter_demographics'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                if (data.success && data.data.length > 0) {
+                    // Group by age_group
+                    const ageData = data.data.filter(d => d.age_group).map(d => `
+                        <div class="chart-item">
+                            <span>${d.age_group}</span>
+                            <div style="flex: 1; margin: 0 1rem; height: 20px; background: #e5e7eb; border-radius: 10px; overflow: hidden;">
+                                <div style="height: 100%; background: var(--primary-color); width: ${d.percentage || 25}%;"></div>
+                            </div>
+                            <span style="min-width: 50px; text-align: right;">${d.vote_count} votes</span>
+                        </div>
+                    `).join('');
+                    document.getElementById('age-distribution').innerHTML = ageData || '<p>No age data available yet.</p>';
+
+                    // Group by region
+                    const regionData = data.data.filter(d => d.region).map(d => `
+                        <div class="chart-item">
+                            <span>${d.region}</span>
+                            <div style="flex: 1; margin: 0 1rem; height: 20px; background: #e5e7eb; border-radius: 10px; overflow: hidden;">
+                                <div style="height: 100%; background: var(--secondary-color); width: ${d.percentage || 25}%;"></div>
+                            </div>
+                            <span style="min-width: 50px; text-align: right;">${d.vote_count} votes</span>
+                        </div>
+                    `).join('');
+                    document.getElementById('geo-distribution').innerHTML = regionData || '<p>No geographic data available yet.</p>';
+                    document.getElementById('gender-distribution').innerHTML = '<p>Gender data is not available in this system yet.</p>';
+
+                    // Generate insights
+                    const totalVotes = data.data.reduce((sum, d) => sum + (d.vote_count || 0), 0);
+                    const topGroup = data.data.reduce((prev, current) => (prev.vote_count > current.vote_count) ? prev : current, {});
+                    const insightsHtml = `
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="chart-item">
+                                <strong>Total Votes:</strong>
+                                <span style="font-size: 1.5rem; color: var(--primary-color);">${totalVotes}</span>
+                            </div>
+                            <div class="chart-item">
+                                <strong>Strongest Group:</strong>
+                                <span>${topGroup.age_group || 'N/A'} (${topGroup.vote_count || 0} votes)</span>
+                            </div>
+                            <div class="chart-item">
+                                <strong>Voting Trend:</strong>
+                                <span style="color: var(--secondary-color);">📈 Increasing</span>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('voter-insights').innerHTML = insightsHtml;
+                } else {
+                    document.getElementById('age-distribution').innerHTML = '<p>No age data available yet.</p>';
+                    document.getElementById('geo-distribution').innerHTML = '<p>No geographic data available yet.</p>';
+                    document.getElementById('gender-distribution').innerHTML = '<p>Gender data is not available in this system yet.</p>';
+                    document.getElementById('voter-insights').innerHTML = '<p>No voter insights available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading demographics:', error);
+                document.getElementById('age-distribution').innerHTML = '<p>Unable to load age data.</p>';
+                document.getElementById('geo-distribution').innerHTML = '<p>Unable to load geographic data.</p>';
+                document.getElementById('gender-distribution').innerHTML = '<p>Unable to load gender data.</p>';
+                document.getElementById('voter-insights').innerHTML = '<p>Unable to load voter insights.</p>';
+            }
+        }
+
+        async function loadBlockchainVerification() {
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=get_blockchain_verification'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                if (data.success && data.data.length > 0) {
+                    const latest = data.data[0];
+                    document.getElementById('current-block-hash').textContent = latest.block_hash || 'Pending...';
+                    document.getElementById('merkle-root').textContent = latest.merkle_root || 'Pending...';
+                    document.getElementById('verified-votes').textContent = latest.vote_count || '0';
+                    document.getElementById('verification-timestamp').textContent = latest.verification_timestamp ? new Date(latest.verification_timestamp).toLocaleString() : 'Pending...';
+
+                    // Show blockchain history
+                    const historyHtml = data.data.map((v, i) => `
+                        <div class="record-item">
+                            <div>
+                                <strong>Block ${i + 1}</strong>
+                                <small style="color: var(--gray-color); display: block;">${new Date(v.verification_timestamp).toLocaleString()}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <div>${v.vote_count} votes</div>
+                                <span class="badge badge-${v.is_verified ? 'success' : 'danger'}">${v.is_verified ? 'Verified' : 'Pending'}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                    document.getElementById('blockchain-records').innerHTML = historyHtml;
+                } else {
+                    document.getElementById('current-block-hash').textContent = 'No verified block yet';
+                    document.getElementById('merkle-root').textContent = 'No Merkle root yet';
+                    document.getElementById('verification-timestamp').textContent = 'No verification timestamp yet';
+                    document.getElementById('blockchain-records').innerHTML = '<p>No blockchain verification records yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading blockchain verification:', error);
+                document.getElementById('current-block-hash').textContent = 'Unavailable';
+                document.getElementById('merkle-root').textContent = 'Unavailable';
+                document.getElementById('verification-timestamp').textContent = 'Unavailable';
+                document.getElementById('blockchain-records').innerHTML = '<p>Unable to load blockchain verification.</p>';
+            }
+        }
+
+        async function loadVoteDisputes() {
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=get_vote_disputes'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                if (data.success && data.data.length > 0) {
+                    const disputesHtml = data.data.map(dispute => `
+                        <div class="dispute-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                <h4>${dispute.dispute_type.replace(/_/g, ' ').toUpperCase()}</h4>
+                                <span class="dispute-status status-${dispute.status}">${dispute.status.toUpperCase()}</span>
+                            </div>
+                            <p>${dispute.description}</p>
+                            ${dispute.resolution_notes ? `<p style="margin-top: 0.5rem; color: var(--gray-color);"><strong>Resolution:</strong> ${dispute.resolution_notes}</p>` : ''}
+                            <small style="color: var(--gray-color);">Reported: ${new Date(dispute.created_at).toLocaleDateString()}</small>
+                        </div>
+                    `).join('');
+                    document.getElementById('disputes-items').innerHTML = disputesHtml;
+                } else {
+                    document.getElementById('disputes-items').innerHTML = '<p>No disputes reported yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading vote disputes:', error);
+                document.getElementById('disputes-items').innerHTML = '<p>Unable to load disputes right now.</p>';
+            }
+        }
+
+        function showAddGoalModal() {
+            document.getElementById('addGoalModal').style.display = 'flex';
+        }
+
+        function showAddPostModal() {
+            document.getElementById('addPostModal').style.display = 'flex';
+        }
+
+        function showReportDisputeModal() {
+            document.getElementById('reportDisputeModal').style.display = 'flex';
+        }
+
+        async function submitAddGoal(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=create_campaign_goal'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        goal_name: document.getElementById('goal-name').value,
+                        goal_description: document.getElementById('goal-description').value,
+                        target_votes: document.getElementById('goal-target-votes').value,
+                        target_date: document.getElementById('goal-target-date').value
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Goal created successfully!');
+                    document.getElementById('addGoalModal').style.display = 'none';
+                    event.target.reset();
+                    loadCampaignManagement();
+                }
+            } catch (error) {
+                console.error('Error creating goal:', error);
+                alert('Failed to create goal');
+            }
+        }
+
+        async function submitAddPost(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=create_campaign_post'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: document.getElementById('post-title').value,
+                        content: document.getElementById('post-content').value,
+                        post_type: document.getElementById('post-type').value
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Post created successfully!');
+                    document.getElementById('addPostModal').style.display = 'none';
+                    event.target.reset();
+                    loadCampaignManagement();
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Failed to create post');
+            }
+        }
+
+        async function submitReportDispute(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(getApiUrl('campaign-management.php?action=report_vote_dispute'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dispute_type: document.getElementById('dispute-type').value,
+                        description: document.getElementById('dispute-description').value,
+                        evidence_url: document.getElementById('dispute-evidence').value
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Dispute reported successfully!');
+                    document.getElementById('reportDisputeModal').style.display = 'none';
+                    event.target.reset();
+                    loadVoteDisputes();
+                }
+            } catch (error) {
+                console.error('Error reporting dispute:', error);
+                alert('Failed to report dispute');
+            }
+        }
+
+        function logoutCandidate() {
+            sessionStorage.removeItem('candidate_id');
+            sessionStorage.removeItem('candidate_name');
+            window.location.href = 'candidate-register.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkCandidateAuth()) {
+                loadCandidateData();
+            }
+        });
+    </script>
+
+    <style>
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 60px);
+            background: var(--bg-color);
+        }
+
+        .sidebar {
+            background: white;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .menu-item {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-color);
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--light-color);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .panel-header {
+            margin-bottom: 2rem;
+        }
+
+        .panel-header h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            gap: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+        }
+
+        .stat-content h3 {
+            color: var(--gray-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .activity-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 0.5rem;
+        }
+
+        .activity-icon {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .activity-content p {
+            margin: 0;
+        }
+
+        .activity-content small {
+            color: var(--gray-color);
+        }
+
+        .campaign-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .campaign-header h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .campaign-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .detail-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-group p {
+            color: var(--gray-color);
+            margin: 0;
+        }
+
+        .results-header {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .result-item {
+            margin-bottom: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-bar {
+            height: 30px;
+            background: var(--light-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .result-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .profile-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .eligibility-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .eligibility-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 0.5rem;
+        }
+
+        .eligibility-item i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .election-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #1f2937;
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .search-group input {
+            width: 220px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.7rem;
+        }
+
+        .elections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .election-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .election-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .election-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .election-card h3 {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .status {
+            font-size: 0.75rem;
+            border-radius: 999px;
+            padding: 0.2rem 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status.ongoing {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status.upcoming {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status.completed {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .election-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin: 0.75rem 0 0.75rem;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 0.35rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+
+        .panel.hidden {
+            display: none;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .analytics-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .analytics-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .geo-item, .time-item, .demo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: var(--light-color);
+            border-radius: 0.375rem;
+        }
+
+        .geo-item span, .time-item span, .demo-item span {
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+
+        .mini-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</body>
+</html>
