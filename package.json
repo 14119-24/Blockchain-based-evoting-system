@@ -1,1 +1,1 @@
-{"name": "evoting-system", "version": "1.0.0", "description": "A blockchain-based electronic voting system.", "main": "index.js", "scripts": { "test": "echo 'Error: no test specified' && exit 1 }, "author": "14119-24", "license": "ISC"}
+{"name": "evoting-system", "version": "1.0.0", "description": "A blockchain-based electronic voting system.", "main": "index.js", "scripts": {"test": "echo no test"}, "author": "14119-24", "license": "ISC"}
