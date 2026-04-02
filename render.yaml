@@ -1,0 +1,20 @@
+# Render.yaml for Blockchain-based E-Voting System
+
+# Configuration for rendering a PHP application
+
+version: 1.0
+
+services:
+  web:
+    type: web
+    env: php
+    build:
+      dockerfile: Dockerfile
+      context: .
+    plan: free
+    routes:
+      - type: path
+        path: / 
+        service: web
+
+# Additional configuration can be added as needed
