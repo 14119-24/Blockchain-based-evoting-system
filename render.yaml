@@ -1,1 +1,16 @@
-# Render.yaml for PHP Application\n\n# This file contains configuration for deploying a PHP application to Render.\n\nservices:\n  - type: web\n    name: My PHP App\n    env: php\n    buildCommand: "composer install"\n    startCommand: "php -S 0.0.0.0:10000 -t public"\n    autoDeploy: true\n    plan: free\n    regions: 1\n    envVars: \n      - key: APP_ENV\n        value: production\n
+# Render.yaml for PHP Application
+
+# This file contains configuration for deploying a PHP application to Render.
+
+services:
+  - type: web
+    name: Blockchain E-Voting System
+    env: php
+    buildCommand: ""
+    startCommand: "php -S 0.0.0.0:8080 -t ."
+    autoDeploy: true
+    plan: free
+    regions: 1
+    envVars: 
+      - key: APP_ENV
+        value: production
