@@ -12,51 +12,51 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 RUN set -eux; \
-    cat > /etc/apache2/sites-available/000-default.conf <<'EOF_APACHE'; \
-<VirtualHost *:10000>
-    ServerName localhost
-    DocumentRoot /var/www/html/public
-    DirectoryIndex index.html index.php
-
-    ErrorLog /proc/self/fd/2
-    CustomLog /proc/self/fd/1 combined
-
-    SetEnvIf X-Forwarded-Proto https HTTPS=on
-
-    <Directory /var/www/html/public>
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    Alias /public/ /var/www/html/public/
-
-    Alias /api/ /var/www/html/api/
-    <Directory /var/www/html/api>
-        Options FollowSymLinks
-        AllowOverride None
-        Require all granted
-        DirectoryIndex index.php
-    </Directory>
-
-    Alias /css/ /var/www/html/css/
-    <Directory /var/www/html/css>
-        Options FollowSymLinks
-        AllowOverride None
-        Require all granted
-
-        <FilesMatch "\.php$">
-            Require all denied
-        </FilesMatch>
-    </Directory>
-
-    Alias /setup-api.php /var/www/html/setup-api.php
-
-    <LocationMatch "^/(config|core|database|docs|tests|\.vscode)(/|$)">
-        Require all denied
-    </LocationMatch>
-</VirtualHost>
-EOF_APACHE
+    printf '%s\n' \
+    '<VirtualHost *:10000>' \
+    '    ServerName localhost' \
+    '    DocumentRoot /var/www/html/public' \
+    '    DirectoryIndex index.html index.php' \
+    '' \
+    '    ErrorLog /proc/self/fd/2' \
+    '    CustomLog /proc/self/fd/1 combined' \
+    '' \
+    '    SetEnvIf X-Forwarded-Proto https HTTPS=on' \
+    '' \
+    '    <Directory /var/www/html/public>' \
+    '        Options FollowSymLinks' \
+    '        AllowOverride All' \
+    '        Require all granted' \
+    '    </Directory>' \
+    '' \
+    '    Alias /public/ /var/www/html/public/' \
+    '' \
+    '    Alias /api/ /var/www/html/api/' \
+    '    <Directory /var/www/html/api>' \
+    '        Options FollowSymLinks' \
+    '        AllowOverride None' \
+    '        Require all granted' \
+    '        DirectoryIndex index.php' \
+    '    </Directory>' \
+    '' \
+    '    Alias /css/ /var/www/html/css/' \
+    '    <Directory /var/www/html/css>' \
+    '        Options FollowSymLinks' \
+    '        AllowOverride None' \
+    '        Require all granted' \
+    '' \
+    '        <FilesMatch "\.php$">' \
+    '            Require all denied' \
+    '        </FilesMatch>' \
+    '    </Directory>' \
+    '' \
+    '    Alias /setup-api.php /var/www/html/setup-api.php' \
+    '' \
+    '    <LocationMatch "^/(config|core|database|docs|tests|\.vscode)(/|$)">' \
+    '        Require all denied' \
+    '    </LocationMatch>' \
+    '</VirtualHost>' \
+    > /etc/apache2/sites-available/000-default.conf; \
     mkdir -p /var/www/html/public /var/www/html/public/js /var/www/html/css /var/www/html/api; \
     for file in /var/www/html/*.html; do \
         [ -f "$file" ] || continue; \
@@ -82,21 +82,22 @@ EOF_APACHE
         fi; \
     done; \
     if [ ! -e /var/www/html/public/.htaccess ]; then \
-        cat > /var/www/html/public/.htaccess <<'EOF_HTACCESS'; \
-Options -Indexes
-
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    RewriteCond %{REQUEST_FILENAME}.html -f
-    RewriteRule ^([^./]+)$ $1.html [L]
-</IfModule>
-EOF_HTACCESS
+        printf '%s\n' \
+        'Options -Indexes' \
+        '' \
+        '<IfModule mod_rewrite.c>' \
+        '    RewriteEngine On' \
+        '' \
+        '    RewriteCond %{REQUEST_FILENAME} -f [OR]' \
+        '    RewriteCond %{REQUEST_FILENAME} -d' \
+        '    RewriteRule ^ - [L]' \
+        '' \
+        '    RewriteCond %{REQUEST_FILENAME}.html -f' \
+        '    RewriteRule ^([^./]+)$ $1.html [L]' \
+        '</IfModule>' \
+        > /var/www/html/public/.htaccess; \
     fi; \
     chown -R www-data:www-data /var/www/html
 
 EXPOSE 10000
+
