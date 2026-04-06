@@ -57,29 +57,35 @@ RUN set -eux; \
     '    </LocationMatch>' \
     '</VirtualHost>' \
     > /etc/apache2/sites-available/000-default.conf; \
-    mkdir -p /var/www/html/public /var/www/html/public/js /var/www/html/css /var/www/html/api; \
+    mkdir -p /var/www/html/public /var/www/html/public/js /var/www/html/css /var/www/html/api /var/www/html/config /var/www/html/core /var/www/html/database; \
     for file in /var/www/html/*.html; do \
         [ -f "$file" ] || continue; \
-        base="$(basename "$file")"; \
-        [ -e "/var/www/html/public/$base" ] || ln -sf "../$base" "/var/www/html/public/$base"; \
+        cp -f "$file" /var/www/html/public/; \
     done; \
     for file in /var/www/html/*.css; do \
         [ -f "$file" ] || continue; \
-        base="$(basename "$file")"; \
-        [ -e "/var/www/html/css/$base" ] || ln -sf "../$base" "/var/www/html/css/$base"; \
+        cp -f "$file" /var/www/html/css/; \
     done; \
-    for name in api-helper.js MAIN.JS main.js; do \
-        if [ -f "/var/www/html/$name" ] && [ ! -e "/var/www/html/public/js/$name" ]; then \
-            ln -sf "../../$name" "/var/www/html/public/js/$name"; \
-        fi; \
+    for file in /var/www/html/api-helper.js /var/www/html/MAIN.JS /var/www/html/main.js; do \
+        [ -f "$file" ] || continue; \
+        cp -f "$file" /var/www/html/public/js/; \
     done; \
-    if [ ! -e /var/www/html/public/js/main.js ] && [ -f /var/www/html/MAIN.JS ]; then \
-        ln -sf "../../MAIN.JS" /var/www/html/public/js/main.js; \
-    fi; \
-    for name in add-candidates.php admin-candidate-registrations.php admin-candidates.php admin.php auth.php candidate-auth.php campaign-management.php candidates.php check-admin.php check-candidates-schema.php create-admin.php direct-test.php election.php get-voters.php mpesa-callback.php test-candidates.php test-login.php test-register.php test.php vote.php; do \
-        if [ -f "/var/www/html/$name" ] && [ ! -e "/var/www/html/api/$name" ]; then \
-            ln -sf "../$name" "/var/www/html/api/$name"; \
-        fi; \
+    if [ -f /var/www/html/MAIN.JS ]; then cp -f /var/www/html/MAIN.JS /var/www/html/public/js/main.js; fi; \
+    for file in /var/www/html/add-candidates.php /var/www/html/admin-candidate-registrations.php /var/www/html/admin-candidates.php /var/www/html/admin.php /var/www/html/auth.php /var/www/html/candidate-auth.php /var/www/html/campaign-management.php /var/www/html/candidates.php /var/www/html/check-admin.php /var/www/html/check-candidates-schema.php /var/www/html/create-admin.php /var/www/html/direct-test.php /var/www/html/election.php /var/www/html/get-voters.php /var/www/html/mpesa-callback.php /var/www/html/test-candidates.php /var/www/html/test-login.php /var/www/html/test-register.php /var/www/html/test.php /var/www/html/vote.php; do \
+        [ -f "$file" ] || continue; \
+        cp -f "$file" /var/www/html/api/; \
+    done; \
+    for file in /var/www/html/database.php /var/www/html/admin_database.php /var/www/html/env.php /var/www/html/mpesa.php /var/www/html/database.example.php /var/www/html/admin_database.example.php /var/www/html/mpesa.example.php; do \
+        [ -f "$file" ] || continue; \
+        cp -f "$file" /var/www/html/config/; \
+    done; \
+    for file in /var/www/html/AdminAuth.php /var/www/html/Blockchain.php /var/www/html/Cryptography.php /var/www/html/MpesaService.php /var/www/html/SystemSettings.php /var/www/html/Validator.php; do \
+        [ -f "$file" ] || continue; \
+        cp -f "$file" /var/www/html/core/; \
+    done; \
+    for file in /var/www/html/schema.sql /var/www/html/admin_schema.sql /var/www/html/create-campaign-management-tables.sql /var/www/html/create-candidate-registration-table.sql /var/www/html/create-payment-table.sql /var/www/html/candidates-schema.sql; do \
+        [ -f "$file" ] || continue; \
+        cp -f "$file" /var/www/html/database/; \
     done; \
     if [ ! -e /var/www/html/public/.htaccess ]; then \
         printf '%s\n' \
@@ -100,4 +106,3 @@ RUN set -eux; \
     chown -R www-data:www-data /var/www/html
 
 EXPOSE 10000
-
