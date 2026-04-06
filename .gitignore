@@ -1,0 +1,15 @@
+.vscode/
+tmp_admin_cookie.txt
+
+# Local environment configuration
+config/database.php
+config/admin_database.php
+config/mpesa.php
+database.php
+admin_database.php
+mpesa.php
+
+# OS/editor noise
+Thumbs.db
+Desktop.ini
+*.log
