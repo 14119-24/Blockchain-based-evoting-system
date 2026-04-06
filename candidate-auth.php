@@ -8,6 +8,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/../core/MpesaService.php';
 require_once __DIR__ . '/../core/SystemSettings.php';
 
@@ -650,7 +651,7 @@ function handleForgotPassword() {
         $storeStmt->execute([$candidate['candidate_id'], $tokenHash, $expiryTime]);
 
         // Send reset email
-        $resetLink = "http://" . $_SERVER['HTTP_HOST'] . "/voting_system/public/candidate-reset-password.html?token=" . $resetToken;
+        $resetLink = app_public_url('candidate-reset-password.html') . '?token=' . rawurlencode($resetToken);
         $emailBody = "
             <html>
                 <body style='font-family: Arial, sans-serif;'>

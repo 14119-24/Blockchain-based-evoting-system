@@ -208,8 +208,8 @@
         </div>
 
         <p class="help-text">
-            Access this page through Apache, for example
-            <code>http://localhost/voting_system/public/setup.html</code>.
+            Access this page through your deployed app URL or local web server, for example
+            <code>https://your-service.onrender.com/setup.html</code>.
             Do not open it with <code>file://</code>.
         </p>
     </div>
@@ -247,7 +247,7 @@
 
         async function runSetup() {
             if (window.location.protocol === 'file:') {
-                showMessage('warning', 'Open this page through Apache/XAMPP using http://localhost/voting_system/public/setup.html.');
+                showMessage('warning', 'Open this page through your deployed app URL or a local web server, not with file://.');
                 return;
             }
 

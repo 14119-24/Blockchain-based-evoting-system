@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+node_modules
+tmp_admin_cookie.txt
+config/*.local.php
+.env
+.env.*
+docs
+tests

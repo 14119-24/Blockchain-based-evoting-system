@@ -1,16 +1,18 @@
 <?php
 
+require_once __DIR__ . '/config/admin_database.php';
+
 echo "=== Admin Database Setup ===\n\n";
 
-$host = "localhost";
-$username = "root";
-$password = "";
-$dbName = "admin";
-
 try {
+    $adminDatabase = new AdminDatabase();
+    $dbName = $adminDatabase->getDatabaseName();
+
     echo "Connecting to MySQL server...\n";
-    $pdo = new PDO("mysql:host=$host", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = $adminDatabase->connectWithoutDatabase();
+    if (!$pdo) {
+        throw new RuntimeException('Unable to connect to the admin database server');
+    }
     echo "Connected successfully\n\n";
 
     echo "Creating database '$dbName'...\n";
@@ -26,8 +28,10 @@ try {
     $schema = file_get_contents($schemaFile);
     $statements = preg_split('/;(?=(?:[^\']*\'[^\']*\')*[^\']*$)/', $schema);
 
-    $pdo = new PDO("mysql:host=$host;dbname=$dbName", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = $adminDatabase->connect();
+    if (!$pdo) {
+        throw new RuntimeException("Unable to connect to admin database '$dbName'");
+    }
 
     foreach ($statements as $statement) {
         $statement = trim($statement);
@@ -68,4 +72,3 @@ try {
     echo "Setup failed: " . $e->getMessage() . "\n";
     exit(1);
 }
-?>

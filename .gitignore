@@ -1,10 +1,9 @@
 .vscode/
 tmp_admin_cookie.txt
+.env
 
 # Local environment configuration
-config/database.php
-config/admin_database.php
-config/mpesa.php
+config/*.local.php
 database.php
 admin_database.php
 mpesa.php

@@ -1,16 +1,27 @@
-# Render.yaml for PHP Application
-
-# This file contains configuration for deploying a PHP application to Render.
-
 services:
   - type: web
-    name: Blockchain E-Voting System
-    env: php
-    buildCommand: ""
-    startCommand: "php -S 0.0.0.0:8080 -t ."
-    autoDeploy: true
+    name: blockchain-based-evoting-system
     plan: free
-    regions: 1
-    envVars: 
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    autoDeployTrigger: commit
+    healthCheckPath: /
+    envVars:
       - key: APP_ENV
         value: production
+      - key: APP_FORCE_HTTPS
+        value: "true"
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: MPESA_ENVIRONMENT
+        value: sandbox
+      - key: MPESA_SIMULATE
+        value: "true"

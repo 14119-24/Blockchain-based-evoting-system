@@ -1,8 +1,9 @@
 <?php
-// c:\xampp\htdocs\voting_system\setup-api.php
 // Database Setup API
 
 header('Content-Type: application/json');
+
+require_once __DIR__ . '/config/database.php';
 
 $rawInput = file_get_contents('php://input');
 $jsonInput = json_decode($rawInput, true);
@@ -25,81 +26,77 @@ $status = [
 ];
 
 try {
-    // Database credentials
-    $host = 'localhost';
-    $username = 'root';
-    $password = '';
-    $db_name = 'voting_system';
-    
-    // Connect to MySQL
-    $pdo = new PDO("mysql:host=$host", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database = new Database();
+    $dbName = $database->getDatabaseName();
+
+    $pdo = $database->connectWithoutDatabase();
+    if (!$pdo) {
+        throw new Exception('Unable to connect to the database server');
+    }
+
     $status['database_connected'] = true;
-    
-    // Create database
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
-    
-    // Select the database
-    $pdo->exec("USE `$db_name`");
-    
-    // Read schema file
-    $schema_file = __DIR__ . '/database/schema.sql';
-    if (!file_exists($schema_file)) {
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName`");
+
+    $pdo = $database->connect();
+    if (!$pdo) {
+        throw new Exception('Unable to connect to the application database');
+    }
+
+    $schemaFile = __DIR__ . '/database/schema.sql';
+    if (!file_exists($schemaFile)) {
         throw new Exception('Schema file not found');
     }
-    
-    $schema = file_get_contents($schema_file);
-    
-    // Split and execute statements
+
+    $schema = file_get_contents($schemaFile);
     $statements = preg_split('/;(?=(?:[^\']*\'[^\']*\')*[^\']*$)/', $schema);
-    
+
     foreach ($statements as $statement) {
         $statement = trim($statement);
-        if (!empty($statement)) {
-            try {
-                $pdo->exec($statement);
-            } catch (PDOException $e) {
-                // Ignore "already exists" errors
-                if (strpos($e->getMessage(), 'already exists') === false) {
-                    throw $e;
-                }
+        if ($statement === '') {
+            continue;
+        }
+
+        try {
+            $pdo->exec($statement);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'already exists') === false) {
+                throw $e;
             }
         }
     }
-    
+
     $status['tables_created'] = true;
-    
-    // Create admin user
-    $admin_email = 'admin@votingsystem.local';
-    $admin_password = password_hash('Admin123!', PASSWORD_BCRYPT);
-    $admin_voter_id = 'ADMIN' . strtoupper(substr(md5(time()), 0, 8));
-    $national_id_hash = hash('sha256', 'ADMIN_NATIONAL_ID');
-    
+
+    $adminEmail = 'admin@votingsystem.local';
+    $adminPassword = password_hash('Admin123!', PASSWORD_BCRYPT);
+    $adminVoterId = 'ADMIN' . strtoupper(substr(md5((string) time()), 0, 8));
+    $nationalIdHash = hash('sha256', 'ADMIN_NATIONAL_ID');
+
     try {
-        $stmt = $pdo->prepare("INSERT INTO voters (voter_id, national_id_hash, full_name, email, password_hash, user_type, is_verified) 
-                              VALUES (:voter_id, :national_id_hash, :full_name, :email, :password_hash, 'admin', 1)");
+        $stmt = $pdo->prepare(
+            "INSERT INTO voters (voter_id, national_id_hash, full_name, email, password_hash, user_type, is_verified)
+             VALUES (:voter_id, :national_id_hash, :full_name, :email, :password_hash, 'admin', 1)"
+        );
         $stmt->execute([
-            ':voter_id' => $admin_voter_id,
-            ':national_id_hash' => $national_id_hash,
+            ':voter_id' => $adminVoterId,
+            ':national_id_hash' => $nationalIdHash,
             ':full_name' => 'Administrator',
-            ':email' => $admin_email,
-            ':password_hash' => $admin_password
+            ':email' => $adminEmail,
+            ':password_hash' => $adminPassword
         ]);
         $status['admin_created'] = true;
     } catch (PDOException $e) {
-        // Admin may already exist, that's OK
         if (strpos($e->getMessage(), 'Duplicate entry') === false) {
             throw $e;
         }
         $status['admin_created'] = true;
     }
-    
+
     echo json_encode([
         'success' => true,
         'message' => 'Database setup completed successfully! Redirecting to home page...',
         'status' => $status
     ]);
-    
 } catch (PDOException $e) {
     echo json_encode([
         'success' => false,
@@ -113,4 +110,3 @@ try {
         'status' => $status
     ]);
 }
-?>
